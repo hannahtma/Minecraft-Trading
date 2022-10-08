@@ -91,14 +91,20 @@ class Material:
     """
     
     def __init__(self, name: str, mining_rate: float) -> None:
-        raise NotImplementedError()
+        self.name = name
+        self.mining_rate = mining_rate
     
     def __str__(self) -> str:
-        raise NotImplementedError()
+        material_string = f"{self.name}, {self.mining_rate}"
+        return material_string
 
     @classmethod
     def random_material(cls):
-        raise NotImplementedError()
+        name = RandomGen(0, 81)
+        mining_rate = RandomGen(0.0, 1000000.0)
+
+        return Material(name, mining_rate)
 
 if __name__ == "__main__":
     print(Material("Coal", 4.5))
+    print(len(RANDOM_MATERIAL_NAMES))
