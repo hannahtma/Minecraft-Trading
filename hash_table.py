@@ -29,7 +29,14 @@ class LinearProbeTable(Generic[T]):
             Initialiser.
         """
 
-        raise NotImplementedError()
+        # we add
+        self.count = 0
+        if tablesize_override == -1:
+            self.table = ArrayR(expected_size)
+            self.expected_size = expected_size
+        else:
+            self.table = ArrayR(tablesize_override)
+            self.expected_size = tablesize_override
 
     def hash(self, key: str) -> int:
         """
