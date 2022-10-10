@@ -71,20 +71,22 @@ TRADER_NAMES = [
 class Trader(ABC):
     
     def __init__(self, name: str) -> None:
-        raise NotImplementedError()
+        self.name = name
 
     @classmethod
     def random_trader(cls):
         raise NotImplementedError()
     
+    @abstractmethod
     def set_all_materials(self, mats: list[Material]) -> None:
-        raise NotImplementedError()
+        pass
     
     def add_material(self, mat: Material) -> None:
         raise NotImplementedError()
     
+    @abstractmethod
     def is_currently_selling(self) -> bool:
-        raise NotImplementedError()
+        pass
 
     def current_deal(self) -> tuple[Material, float]:
         raise NotImplementedError()
