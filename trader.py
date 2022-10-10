@@ -71,18 +71,20 @@ TRADER_NAMES = [
 class Trader(ABC):
     
     def __init__(self, name: str) -> None:
-        self.name = name
+        if name not in TRADER_NAMES:
+            self.name = Trader.random_trader()
+        else:
+            self.name = name
 
     @classmethod
     def random_trader(cls):
-        raise NotImplementedError()
+        return RandomGen.random_choice(TRADER_NAMES)
     
-    @abstractmethod
     def set_all_materials(self, mats: list[Material]) -> None:
-        pass
+        self.materials = mats
     
     def add_material(self, mat: Material) -> None:
-        raise NotImplementedError()
+        self.materials.append(mat)
     
     @abstractmethod
     def is_currently_selling(self) -> bool:
@@ -91,6 +93,7 @@ class Trader(ABC):
     def current_deal(self) -> tuple[Material, float]:
         raise NotImplementedError()
     
+    @abstractmethod
     def generate_deal(self) -> None:
         raise NotImplementedError()
 
@@ -102,12 +105,24 @@ class Trader(ABC):
 
 class RandomTrader(Trader):
     
-    pass
+    def generate_deal(self) -> None:
+        self.material_selected =  RandomGen.random_choice(self.materials)
+        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
 
 class RangeTrader(Trader):
+
+    def generate_deal(self) -> None:
+        i = RandomGen.randint(1,len(self.materials))
+        j = RandomGen.randint(i,len(self.materials))
+        self.material_selected = RandomGen.random_choice(RangeTrader.materials_between(i,j))
+        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
     
     def materials_between(self, i: int, j: int) -> list[Material]:
-        raise NotImplementedError()
+        materials_between_list = []
+        for index in range(i-1, j):
+            materials_between_list.append(self.materials[index])
+
+        return materials_between_list
 
 class HardTrader(Trader):
     

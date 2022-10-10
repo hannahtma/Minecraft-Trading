@@ -1,5 +1,6 @@
 from cave import Cave
 from material import Material
+from random_gen import RandomGen
 import unittest
 
 

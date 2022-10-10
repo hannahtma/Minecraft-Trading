@@ -54,7 +54,8 @@ class TestTraders(unittest.TestCase):
         rando.generate_deal()
 
         # check that the deal matches
-        self.assertEqual(str(rando), "<RandomTrader: Mr Barnes buying [Ruby: 3🍗/💎] for 7.57💰>", "Deal check failed")
+        # If you get 2.01 here, try swapping the generation of material choice and sell price.
+        self.assertEqual(str(rando), "<RandomTrader: Mr Barnes buying [Pickaxe: 7🍗/💎] for 7.57💰>", "Deal check failed")
 
     def test_range_str(self):
         RandomGen.set_seed(16)

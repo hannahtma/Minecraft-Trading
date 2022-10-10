@@ -97,7 +97,7 @@ class Game:
             if cave.quantity > 0 and RandomGen.random_chance(0.2):
                 cave.remove_quantity(RandomGen.random_float() * cave.quantity)
             else:
-                cave.add_quantity(RandomGen.random_float() * 10, 2)
+                cave.add_quantity(round(RandomGen.random_float() * 10, 2))
             cave.quantity = round(cave.quantity, 2)
 
 class SoloGame(Game):
@@ -207,3 +207,4 @@ if __name__ == "__main__":
 
     g.simulate_day()
     g.finish_day()
+
