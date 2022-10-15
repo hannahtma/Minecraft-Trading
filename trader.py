@@ -111,7 +111,11 @@ class RandomTrader(Trader):
 
 class RangeTrader(Trader):
 
+    def sortFn(self, material_list):
+        return material_list
+
     def generate_deal(self) -> None:
+        self.materials.sort(reverse=False)
         i = RandomGen.randint(1,len(self.materials))
         j = RandomGen.randint(i,len(self.materials))
         self.material_selected = RandomGen.random_choice(RangeTrader.materials_between(i,j))
