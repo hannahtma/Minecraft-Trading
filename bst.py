@@ -179,9 +179,12 @@ class BinarySearchTree(Generic[K, I]):
             larger keys.
             If no such node exists, then none should be returned.
         """
-        current = current.right
-        while current.left != None:
-            current = current.left
+        if current.right == None:
+            current = None
+        else:
+            current = current.right
+            while current.left != None:
+                current = current.left
 
         return current
 
@@ -191,7 +194,7 @@ class BinarySearchTree(Generic[K, I]):
         """
         while current.left != None:
             current = current.left
-            
+
         return current
 
     def is_leaf(self, current: TreeNode) -> bool:
