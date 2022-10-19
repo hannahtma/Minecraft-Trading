@@ -1,4 +1,4 @@
-from avl import AVLTree
+from bst import BinarySearchTree
 from node import TreeNode
 import random
 import unittest
@@ -31,7 +31,7 @@ class TestBST(unittest.TestCase):
         for attempt in range(10):
             random.shuffle(numbers)
 
-            tree = AVLTree()
+            tree = BinarySearchTree()
             self.setUp()  # clearing the cache
             length = random.randint(10, 100)
             for num in numbers[:length]:
@@ -44,7 +44,7 @@ class TestBST(unittest.TestCase):
         for attempt in range(10):
             random.shuffle(numbers)
 
-            tree = AVLTree()
+            tree = BinarySearchTree()
             self.setUp()  # clearing the cache
             length = random.randint(10, 100)
             sorted_array = []
@@ -63,7 +63,7 @@ class TestBST(unittest.TestCase):
         random.seed(16)
         numbers = list(range(1, 100))
 
-        tree = AVLTree()
+        tree = BinarySearchTree()
         self.setUp()  # clearing the cache
         length = random.randint(10, 100)
         sorted_array = []
@@ -82,7 +82,7 @@ class TestBST(unittest.TestCase):
         random.seed(16)
         numbers = list(range(1, 100))
 
-        tree = AVLTree()
+        tree = BinarySearchTree()
         self.setUp()  # clearing the cache
         length = random.randint(10, 100)
         sorted_array = []
@@ -102,7 +102,7 @@ class TestBST(unittest.TestCase):
         for attempt in range(10):
             random.shuffle(numbers)
 
-            tree = AVLTree()
+            tree = BinarySearchTree()
             self.setUp()  # clearing the cache
             length = random.randint(10, 100)
             sorted_array = []

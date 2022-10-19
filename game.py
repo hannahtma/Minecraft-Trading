@@ -190,7 +190,7 @@ class MultiplayerGame(Game):
         """
         raise NotImplementedError()
 
-    def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
+    def verify_output_and_update_quantities(self, foods: list[Food | None], balances: list[float], caves: list[tuple[Cave, float]|None]) -> None:
         raise NotImplementedError()
 
 if __name__ == "__main__":
@@ -207,4 +207,3 @@ if __name__ == "__main__":
 
     g.simulate_day()
     g.finish_day()
-

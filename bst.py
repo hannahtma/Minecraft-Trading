@@ -175,8 +175,9 @@ class BinarySearchTree(Generic[K, I]):
     def get_successor(self, current: TreeNode) -> TreeNode:
         """
             Get successor of the current node.
-            It should be a child node having the smallest key among all the
+            It should be a node in the subtree rooted at current having the smallest key among all the
             larger keys.
+            If no such node exists, then none should be returned.
         """
         raise NotImplementedError()
 
