@@ -179,13 +179,20 @@ class BinarySearchTree(Generic[K, I]):
             larger keys.
             If no such node exists, then none should be returned.
         """
-        raise NotImplementedError()
+        current = current.right
+        while current.left != None:
+            current = current.left
+
+        return current
 
     def get_minimal(self, current: TreeNode) -> TreeNode:
         """
             Get a node having the smallest key in the current sub-tree.
         """
-        raise NotImplementedError()
+        while current.left != None:
+            current = current.left
+            
+        return current
 
     def is_leaf(self, current: TreeNode) -> bool:
         """ Simple check whether or not the node is a leaf. """

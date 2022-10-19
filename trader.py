@@ -86,16 +86,15 @@ class Trader(ABC):
     def add_material(self, mat: Material) -> None:
         self.materials.append(mat)
     
-    @abstractmethod
     def is_currently_selling(self) -> bool:
-        pass
+        return self.materials
 
     def current_deal(self) -> tuple[Material, float]:
         raise NotImplementedError()
     
     @abstractmethod
     def generate_deal(self) -> None:
-        raise NotImplementedError()
+        pass
 
     def stop_deal(self) -> None:
         raise NotImplementedError()
