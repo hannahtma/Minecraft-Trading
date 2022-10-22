@@ -51,7 +51,17 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             Attempts to insert an item into the tree, it uses the Key to insert it
             
         """
-        raise NotImplementedError()
+        
+        if current is None:
+            current = AVLTreeNode(key, item)
+        elif key < current.key:
+            current.left = self.insert_aux(current.left, key, item)
+        elif key > current.key:
+            current.right = self.insert_aux(current.right, key, item)
+        else:
+            raise ValueError("Inserting duplicate item")
+
+        return current
 
     def delete_aux(self, current: AVLTreeNode, key: K) -> AVLTreeNode:
         """
@@ -59,7 +69,8 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             determine the node to delete.
         """
 
-        raise NotImplementedError()
+        BinarySearchTree.delete_aux(self, current, key)
+        self.rebalance(current)
 
     def left_rotate(self, current: AVLTreeNode) -> AVLTreeNode:
         """
@@ -78,7 +89,15 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             :complexity: O(1)
         """
 
-        raise NotImplementedError()
+        if current.right != None:
+            self.root = current.right
+            current.right = self.root.left
+            self.root.left = current
+
+            self.update_height(current, self.get_height(current) - 1)
+            self.update_height(self.root, self.get_height(self.root) + 1)
+
+        return self.root
 
     def right_rotate(self, current: AVLTreeNode) -> AVLTreeNode:
         """
@@ -97,8 +116,15 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             :complexity: O(1)
         """
 
-        raise NotImplementedError()
+        if current.left != None:
+            self.root = current.left
+            current.left = self.root.right
+            self.root.right = current
 
+            self.update_height(current, self.get_height(current) - 1)
+            self.update_height(self.root, self.get_height(self.root) + 1)
+
+        return self.root
 
     def rebalance(self, current: AVLTreeNode) -> AVLTreeNode:
         """ Compute the balance of the current node.
@@ -131,3 +157,12 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         :complexity ...
         """
         raise NotImplementedError()
+
+    def update_height(self, current: AVLTreeNode, height: int) -> None:
+        """
+        Updates the height of current node
+
+        :complexity: O(1)
+        """
+
+        current.height = height
