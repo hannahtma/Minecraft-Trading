@@ -15,6 +15,13 @@ T = TypeVar('T')
 
 
 class LinearProbeTable(Generic[T]):
+    MIN_CAPACITY = 1
+    DEFAULT_HASH_BASE = 31
+    PRIMES = [3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
+              1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519, 21023,
+              25229, 30313, 36353, 43627, 52361, 62851, 75521, 90523, 108631, 130363, 156437, 187751, 225307, 270371,
+              324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263, 1674319, 2009191, 2411033,
+              2893249, 3471899, 4166287, 4999559, 5999471, 7199369]
     """
         Linear Probe Table.
 
@@ -27,16 +34,26 @@ class LinearProbeTable(Generic[T]):
     def __init__(self, expected_size: int, tablesize_override: int = -1) -> None:
         """
             Initialiser.
+            
         """
 
-        raise NotImplementedError()
+        self.count = 0
+        if tablesize_override == -1:
+            tablesize_override = expected_size
 
+        self.table = ArrayR(max(self.MIN_CAPACITY, tablesize_override))
+        
     def hash(self, key: str) -> int:
         """
             Hash a key for insertion into the hashtable.
         """
 
-        raise NotImplementedError()
+        value = 0
+        a = 31415
+        for char in key:
+            value = (ord(char) + a * value) % len(self.table)
+            a = a * LinearProbeTable.DEFAULT_HASH_BASE % (len(self.table) - 1)
+        return value
 
     def statistics(self) -> tuple:
         raise NotImplementedError()
@@ -156,7 +173,15 @@ class LinearProbeTable(Generic[T]):
             Need to resize table and reinsert all values
         """
 
-        raise NotImplementedError()
+        new_hash = LinearProbeTable(LinearProbeTable.PRIMES[self.next_prime])
+        self.next_prime += 1
+
+        for i in range(len(self.table)):
+            if self.table[i] is not None:
+                new_hash[str(self.table[i][0])] = self.table[i][1]
+
+        self.count = new_hash.count
+        self.table = new_hash.table
 
     def __str__(self) -> str:
         """
