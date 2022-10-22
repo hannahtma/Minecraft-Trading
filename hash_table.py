@@ -28,7 +28,6 @@ class LinearProbeTable(Generic[T]):
         """
             Initialiser.
         """
-
         # we add
         self.count = 0
         if tablesize_override == -1:

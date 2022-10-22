@@ -116,10 +116,11 @@ class TestBST(unittest.TestCase):
             self.assertEqual(array, sorted_array, 'In-Order traversal produces a wrong order: {0}'.format(array))
 
 if __name__ == "__main__":
-    a = TestBST()
-    #a.check_invariant()
-    a.testInvariant()
-    a.testDelete()
-    a.testMinimal()
-    a.testSuccessor()
-    a.testInOrder()
+    unittest.main()
+    # a = TestBST()
+    # #a.check_invariant()
+    # a.testInvariant()
+    # a.testDelete()
+    # a.testMinimal()
+    # a.testSuccessor()
+    # a.testInOrder()

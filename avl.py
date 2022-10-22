@@ -3,7 +3,8 @@
 __author__ = 'Alexey Ignatiev, with edits by Jackson Goerner'
 __docformat__ = 'reStructuredText'
 
-from bst import BinarySearchTree
+from platform import node
+from bst import BinarySearchTree, BSTInOrderIterator
 from typing import TypeVar, Generic, List
 from node import AVLTreeNode
 
@@ -51,8 +52,20 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             Attempts to insert an item into the tree, it uses the Key to insert it
             
         """
-        current = BinarySearchTree.insert_aux(self,current,key,item)
-        self.update_height(self.root, 1 + max(self.get_height(self.root.left),self.get_height(self.root.right)))
+        if current is None:  # base case: at the leaf
+            current = AVLTreeNode(key, item)
+            self.length += 1
+        elif key < current.key:
+            current.left = self.insert_aux(current.left, key, item)
+        elif key > current.key:
+            current.right = self.insert_aux(current.right, key, item)
+        else:  # key == current.key
+            raise ValueError('Inserting duplicate item')
+        
+        # Update height
+        current.height = 1 + max(self.get_height(current.left), self.get_height(current.right))
+
+        # Rebalance if needed
         current = self.rebalance(current)
 
         return current
@@ -62,8 +75,30 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             Attempts to delete an item from the tree, it uses the Key to
             determine the node to delete.
         """
-        current = BinarySearchTree.delete_aux(self,current,key)
-        self.update_height(self.root, 1 + max(self.get_height(self.root.left),self.get_height(self.root.right)))
+        if current is None:  # key not found
+            raise ValueError('Deleting non-existent item')
+        elif key < current.key:
+            current.left  = self.delete_aux(current.left, key)
+        elif key > current.key:
+            current.right = self.delete_aux(current.right, key)
+        else:  # we found our key => do actual deletion
+            if self.is_leaf(current):
+                self.length -= 1
+                return None
+            elif current.left is None:
+                self.length -= 1
+                return current.right
+            elif current.right is None:
+                self.length -= 1
+                return current.left
+
+            # general case => find a successor
+            succ = self.get_successor(current)
+            current.key  = succ.key
+            current.item = succ.item
+            current.right = self.delete_aux(current.right, succ.key)
+
+        current.height = 1 + max(self.get_height(current.left),self.get_height(current.right))
         current = self.rebalance(current)
 
         return current
@@ -85,14 +120,15 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             :complexity: O(1)
         """
 
-        self.root = current.right
-        current.right = self.root.left
-        self.root.left = current
+        new_root = current.right
+        node_to_move = new_root.left
+        new_root.left = current
+        current.right = node_to_move
 
-        self.update_height(current, self.get_height(current) - 1)
-        self.update_height(self.root, self.get_height(self.root) + 1)
+        current.height = 1 + max(self.get_height(current.left), self.get_height(current.right))
+        new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
 
-        return self.root
+        return new_root
 
 
     def right_rotate(self, current: AVLTreeNode) -> AVLTreeNode:
@@ -112,14 +148,15 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             :complexity: O(1)
         """
 
-        self.root = current.left
-        current.left = self.root.right
-        self.root.right = current
+        new_root = current.left
+        node_to_move = new_root.right
+        new_root.right = current
+        current.left = node_to_move
 
-        self.update_height(current, self.get_height(current) - 1)
-        self.update_height(self.root, self.get_height(self.root) + 1)
+        current.height = 1 + max(self.get_height(current.left), self.get_height(current.right))
+        new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
 
-        return self.root
+        return new_root
 
 
     def rebalance(self, current: AVLTreeNode) -> AVLTreeNode:
@@ -152,7 +189,16 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         
         :complexity ...
         """
-        raise NotImplementedError()
+        ranged_list = []
+        wholeTree = iter(BSTInOrderIterator(self.root))
+        n = 0
+        if j < self.length:
+            while n <= j:
+                value_to_check = next(wholeTree)
+                if n >= i:
+                    ranged_list.append(value_to_check)
+                n += 1
 
-    def update_height(self, current: AVLTreeNode, height: int) -> None:
-        current.height = height
+        return ranged_list
+
+

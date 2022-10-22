@@ -33,7 +33,6 @@ class BSTInOrderIterator:
 
     def __iter__(self) -> BSTInOrderIterator:
         """ Standard __iter__() method for initialisers. Returns itself. """
-
         return self
 
     def __next__(self) -> K:
