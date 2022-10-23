@@ -13,11 +13,10 @@ from referential_array import ArrayR
 from typing import TypeVar, Generic
 T = TypeVar('T')
 
-import primes
+from primes import LargestPrimeIterator
 
 class LinearProbeTable(Generic[T]):
     MIN_CAPACITY = 1
-    DEFAULT_HASH_BASE = 13
     PRIMES = [3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
               1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519, 21023,
               25229, 30313, 36353, 43627, 52361, 62851, 75521, 90523, 108631, 130363, 156437, 187751, 225307, 270371,
@@ -37,9 +36,12 @@ class LinearProbeTable(Generic[T]):
             Initialiser.
             
         """
+        self.current_prime = LargestPrimeIterator(tablesize_override, 13)
+
         self.conflict_count = 0
         self.probe_total = 0
         self.probe_max = 0
+        self.rehash_count = 0
 
         self.count = 0
         self.tablesize = tablesize_override
@@ -54,19 +56,15 @@ class LinearProbeTable(Generic[T]):
         """
         alphabets = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
-        first_alphabet = key[0].upper()
+        first_alphabet = key[0]
+        print("first alphabet",first_alphabet)
         value = alphabets.index(first_alphabet)
         value = value % len(self.table)
 
         return value
 
     def statistics(self) -> tuple:
-        rehash_count = 0
-
-        if self.__len__() > self.tablesize:
-            rehash_count += 1
-
-        return (self.conflict_count, self.probe_total, self.probe_max, rehash_count)
+        return (self.conflict_count, self.probe_total, self.probe_max, self.rehash_count)
 
     def __len__(self) -> int:
         """
@@ -162,6 +160,8 @@ class LinearProbeTable(Generic[T]):
 
         position = self._linear_probe(key, True)
 
+        if self.__len__() > self.tablesize // 2:
+            self._rehash()
         if self.table[position] is None:
             self.count += 1
 
@@ -186,6 +186,7 @@ class LinearProbeTable(Generic[T]):
             Utility method to call our setitem method
             :see: #__setitem__(self, key: str, data: T)
         """
+        
         self[key] = data
 
     def _rehash(self) -> None:
@@ -193,10 +194,12 @@ class LinearProbeTable(Generic[T]):
             Need to resize table and reinsert all values
         """
 
-        new_hash = LinearProbeTable(primes[self.next])
+        self.rehash_count += 1
+        new_hash = LinearProbeTable(self.current_prime.__next__())
 
         for item in range(len(self.table)):
-            new_hash.hash(item)
+            if self.table.__getitem__(item) != None:
+                new_hash[str(self.table[item][0])] = self.table[item][1]
 
         self.count = new_hash.count
         self.table = new_hash.table
