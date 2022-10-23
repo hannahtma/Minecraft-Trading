@@ -36,19 +36,27 @@ class LinearProbeTable(Generic[T]):
             Initialiser.
             
         """
-        self.current_prime = LargestPrimeIterator(tablesize_override, 13)
 
+        # self.prime_iterator = iter(LargestPrimeIterator(expected_size, tablesize_override))
+        
         self.conflict_count = 0
         self.probe_total = 0
         self.probe_max = 0
         self.rehash_count = 0
 
         self.count = 0
+        self.expected_size = expected_size
         self.tablesize = tablesize_override
+        iterator = LargestPrimeIterator(self.expected_size, self.tablesize)
+        self.next_prime = iterator.__next__()
+
         if self.tablesize == -1:
             self.tablesize = expected_size
 
-        self.table = ArrayR(self.tablesize)
+        self.table = ArrayR(max(self.MIN_CAPACITY, self.tablesize))
+
+        while len(self.table) > self.next_prime:
+            self.next_prime = iterator.__next__()
         
     def hash(self, key: str) -> int:
         """
@@ -56,14 +64,26 @@ class LinearProbeTable(Generic[T]):
         """
         alphabets = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
-        first_alphabet = key[0]
-        print("first alphabet",first_alphabet)
-        value = alphabets.index(first_alphabet)
-        value = value % len(self.table)
+        value = 0
+
+        for char in key:
+            value = (value * self.expected_size + ord(char)) % len(self.table)
 
         return value
 
+
     def statistics(self) -> tuple:
+        """
+            Gets statistics for the hash table
+
+            Returns a tuple containing:
+                conflict_count - total number of conflicts
+                probe_total - total distance probed throughout execution of code
+                probe_max - length of longest probe chain
+                rehash_count - total number of times rehashing is done
+
+            :complexity: O(1)
+        """
         return (self.conflict_count, self.probe_total, self.probe_max, self.rehash_count)
 
     def __len__(self) -> int:
@@ -195,7 +215,7 @@ class LinearProbeTable(Generic[T]):
         """
 
         self.rehash_count += 1
-        new_hash = LinearProbeTable(self.current_prime.__next__())
+        new_hash = LinearProbeTable(self.expected_size, self.next_prime)
 
         for item in range(len(self.table)):
             if self.table.__getitem__(item) != None:
@@ -216,7 +236,3 @@ class LinearProbeTable(Generic[T]):
                 (key, value) = item
                 result += "(" + str(key) + "," + str(value) + ")\n"
         return result
-
-if __name__ == "__main__":
-    table = LinearProbeTable(10, tablesize_override=19)
-    print(table.__str__())
