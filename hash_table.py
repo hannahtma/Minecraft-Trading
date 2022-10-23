@@ -61,8 +61,8 @@ class LinearProbeTable(Generic[T]):
     def hash(self, key: str) -> int:
         """
             Hash a key for insertion into the hashtable.
+            :complexity: O(N) where N is length of key
         """
-        alphabets = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
         value = 0
 
@@ -212,6 +212,8 @@ class LinearProbeTable(Generic[T]):
     def _rehash(self) -> None:
         """
             Need to resize table and reinsert all values
+
+            :complexity: O(N) where N is length of self.table
         """
 
         self.rehash_count += 1
