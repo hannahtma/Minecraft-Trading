@@ -20,14 +20,15 @@ class LargestPrimeIterator():
             while (i <= number/2 and prime_flag == True):
                 if (number % i == 0):
                     prime_flag = False
-                i += 1
+
+                i += 1 
 
             if prime_flag == True:
-                self.largest_prime = number
+                largest_prime = number    
 
-        self.upper_bound = self.largest_prime * self.factor
+        self.upper_bound = largest_prime * self.factor
 
-        return self.largest_prime
+        return largest_prime
 
 if __name__ == '__main__':
     it1 = LargestPrimeIterator(6,2)
