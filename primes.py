@@ -9,6 +9,7 @@ class LargestPrimeIterator():
     def __init__(self, upper_bound, factor):
         self.upper_bound = upper_bound
         self.factor = factor
+        self.largest_prime = 2
 
     def __next__(self):
         for number in range(2, self.upper_bound):
@@ -25,7 +26,6 @@ class LargestPrimeIterator():
         self.upper_bound = self.largest_prime * self.factor
 
         return self.largest_prime
-
     
     def __iter__(self):
         return self
