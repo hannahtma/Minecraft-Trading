@@ -21,8 +21,9 @@ T = TypeVar('T')
 
 
 class BSTInOrderIterator:
-    """ In-order iterator for the binary search tree.
-        Performs stack-based BST traversal.
+    """ 
+    In-order iterator for the binary search tree.
+    Performs stack-based BST traversal.
     """
 
     def __init__(self, root: TreeNode[K, I]) -> None:
@@ -144,6 +145,10 @@ class BinarySearchTree(Generic[K, I]):
         """
             Attempts to delete an item from the tree, it uses the Key to
             determine the node to delete.
+            :complexity best: O(CompK) deletes the item at the root.
+            :complexity worst: O(CompK * D) deletes at the bottom of the tree
+            where D is the depth of the tree
+            CompK is the complexity of comparing the keys
         """
 
         if current is None:  # key not found
@@ -177,12 +182,19 @@ class BinarySearchTree(Generic[K, I]):
             It should be a node in the subtree rooted at current having the smallest key among all the
             larger keys.
             If no such node exists, then none should be returned.
+
+            Best Complexity: O(1), where there is no successor
+            Worst Complexity: O(D), where there is a successor
+            where D is the depth of the right subtree
         """
+        # if the current does not have a right node, there is no successor
         if current.right == None:
             current = None
         else:
+            # if there is a right node, moves the current to the right
             current = current.right
             while current.left != None:
+                # checks all the way to the left to find the smallest value in the right subtree
                 current = current.left
 
         return current
