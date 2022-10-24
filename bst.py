@@ -122,6 +122,7 @@ class BinarySearchTree(Generic[K, I]):
     def insert_aux(self, current: TreeNode, key: K, item: I) -> TreeNode:
         """
             Attempts to insert an item into the tree, it uses the Key to insert it
+
             :complexity best: O(CompK) inserts the item at the root.
             :complexity worst: O(CompK * D) inserting at the bottom of the tree
             where D is the depth of the tree
@@ -145,6 +146,7 @@ class BinarySearchTree(Generic[K, I]):
         """
             Attempts to delete an item from the tree, it uses the Key to
             determine the node to delete.
+            
             :complexity best: O(CompK) deletes the item at the root.
             :complexity worst: O(CompK * D) deletes at the bottom of the tree
             where D is the depth of the tree
@@ -202,6 +204,10 @@ class BinarySearchTree(Generic[K, I]):
     def get_minimal(self, current: TreeNode) -> TreeNode:
         """
             Get a node having the smallest key in the current sub-tree.
+
+            Best Complexity: O(1), where current is the smallest key node
+            Worst Complexity: O(D), where current is the root of the tree
+            where D is the depth of the tree
         """
         while current.left != None:
             current = current.left
