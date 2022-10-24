@@ -122,9 +122,20 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
 
         new_root = current.right
         node_to_move = new_root.left
-        new_root.left = current
-        current.right = node_to_move
 
+        new_root.left = current
+        #        new root                                  
+        #        /     \                                    
+        #    current    r-tree
+
+        current.right = node_to_move
+        #          new root
+        #          /      \
+        #    current       r-tree
+        #    /     \            
+        #  l-tree  node to move
+
+        # updates the heights of current and the new root aka child
         current.height = 1 + max(self.get_height(current.left), self.get_height(current.right))
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
 
@@ -150,9 +161,20 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
 
         new_root = current.left
         node_to_move = new_root.right
-        new_root.right = current
-        current.left = node_to_move
 
+        new_root.right = current
+        #        new root                                  
+        #        /     \                                    
+        #    l-tree    current
+
+        current.left = node_to_move
+        #          new root
+        #          /      \
+        #    l-tree       current
+        #                 /     \            
+        #       node to move    r-tree
+
+        # updates the heights of current and the new root
         current.height = 1 + max(self.get_height(current.left), self.get_height(current.right))
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
 
@@ -187,16 +209,17 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         """
         Returns a sorted list of all elements in the tree between the ith and jth indices, inclusive.
         
-        :complexity ...
+        :complexity: O(j - i + log(N))
+        where N is the number of total nodes
         """
-        ranged_list = []
-        wholeTree = iter(BSTInOrderIterator(self.root))
+        ranged_list = [] # creates empty list
+        wholeTree = iter(BSTInOrderIterator(self.root)) # saves wholeTree as the iterable of BSTInOrderIterator
         n = 0
-        if j < self.length:
-            while n <= j:
-                value_to_check = next(wholeTree)
-                if n >= i:
-                    ranged_list.append(value_to_check)
+        if j < self.length: # making sure j is in the range of the length of the tree
+            while n <= j: # while n less than equals to j
+                value_to_check = next(wholeTree) # checks the next value of the iterator
+                if n >= i: # if n is more than i aka within the range
+                    ranged_list.append(value_to_check) # adds the value into the list
                 n += 1
 
         return ranged_list
