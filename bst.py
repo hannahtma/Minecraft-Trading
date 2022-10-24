@@ -27,18 +27,29 @@ class BSTInOrderIterator:
     """
 
     def __init__(self, root: TreeNode[K, I]) -> None:
-        """ Iterator initialiser. """
+        """ 
+        Iterator initialiser. 
+        
+        Complexity: O(1)
+        """
 
         self.stack = LinkedStack()
         self.current = root
 
     def __iter__(self) -> BSTInOrderIterator:
-        """ Standard __iter__() method for initialisers. Returns itself. """
+        """ 
+        Standard __iter__() method for initialisers. Returns itself. 
+        
+        Complexity: O(1)
+        """
         return self
 
     def __next__(self) -> K:
-        """ The main body of the iterator.
-            Returns keys of the BST one by one respecting the in-order.
+        """ 
+        The main body of the iterator.
+        Returns keys of the BST one by one respecting the in-order.
+
+        Complexity: O(1)
         """
 
         while self.current:
@@ -74,7 +85,11 @@ class BinarySearchTree(Generic[K, I]):
         return self.root is None
 
     def __len__(self) -> int:
-        """ Returns the number of nodes in the tree. """
+        """ 
+        Returns the number of nodes in the tree. 
+        
+        Complexity: O(1)
+        """
 
         return self.length
 
@@ -82,6 +97,7 @@ class BinarySearchTree(Generic[K, I]):
         """
             Checks to see if the key is in the BST
             :complexity: see __getitem__(self, key: K) -> (K, I)
+
         """
         try:
             _ = self[key]
@@ -91,7 +107,11 @@ class BinarySearchTree(Generic[K, I]):
             return True
 
     def __iter__(self) -> BSTInOrderIterator:
-        """ Create an in-order iterator. """
+        """ 
+        Create an in-order iterator. 
+        
+        Complexity: O(1)
+        """
         return BSTInOrderIterator(self.root)
 
     def __getitem__(self, key: K) -> I:
@@ -104,9 +124,22 @@ class BinarySearchTree(Generic[K, I]):
         return self.get_tree_node_by_key(key).item
 
     def get_tree_node_by_key(self, key: K) -> TreeNode:
+        """
+        Returns the node by the key
+
+        Complexity: see get_tree_node_by_key_aux(self, current: TreeNode, key: K) -> TreeNode
+        """
         return self.get_tree_node_by_key_aux(self.root, key)
 
     def get_tree_node_by_key_aux(self, current: TreeNode, key: K) -> TreeNode:
+        """
+        Returns the node by the key
+
+        :complexity best: O(CompK) returns the item at the root.
+        :complexity worst: O(CompK * D) returns at the bottom of the tree
+        where D is the depth of the tree
+        CompK is the complexity of comparing the keys
+        """
         if current is None:  # base case: empty
             raise KeyError('Key not found: {0}'.format(key))
         elif key == current.key:  # base case: found
@@ -117,6 +150,11 @@ class BinarySearchTree(Generic[K, I]):
             return self.get_tree_node_by_key_aux(current.right, key)
 
     def __setitem__(self, key: K, item: I) -> None:
+        """
+        Sets the item at a key in terms of root
+
+        Complexity: see insert_aux(self, current: TreeNode, key: K, item: I) -> TreeNode
+        """
         self.root = self.insert_aux(self.root, key, item)
 
     def insert_aux(self, current: TreeNode, key: K, item: I) -> TreeNode:
@@ -140,6 +178,11 @@ class BinarySearchTree(Generic[K, I]):
         return current
 
     def __delitem__(self, key: K) -> None:
+        """
+        Deletes the item at a certain key in relation to the root
+
+        Complexity: see delete_aux(self, current: TreeNode, key: K) -> TreeNode
+        """
         self.root = self.delete_aux(self.root, key)
 
     def delete_aux(self, current: TreeNode, key: K) -> TreeNode:
@@ -215,19 +258,32 @@ class BinarySearchTree(Generic[K, I]):
         return current
 
     def is_leaf(self, current: TreeNode) -> bool:
-        """ Simple check whether or not the node is a leaf. """
+        """ 
+        Simple check whether or not the node is a leaf. 
+        
+        Complexity: O(1)
+        """
 
         return current.left is None and current.right is None
 
     def draw(self, to=sys.stdout):
-        """ Draw the tree in the terminal. """
+        """ 
+        Draw the tree in the terminal. 
+        
+        Complexity: see draw_aux(self, current: TreeNode, prefix='', final='', to=sys.stdout) -> K
+        """
 
         # get the nodes of the graph to draw recursively
         self.draw_aux(self.root, prefix='', final='', to=to)
 
     def draw_aux(self, current: TreeNode, prefix='', final='', to=sys.stdout) -> K:
-        """ Draw a node and then its children. """
-
+        """ 
+        Draw a node and then its children. 
+        
+        Best Complexity: O(1), where current is None
+        Worst Complexity: O(n), where current is not None
+        where n is the depth of the left leaf node
+        """
         if current is not None:
             real_prefix = prefix[:-2] + final
             print('{0}{1}'.format(real_prefix, str(current.key)), file=to)
