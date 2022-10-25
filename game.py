@@ -97,7 +97,7 @@ class Game:
             if cave.quantity > 0 and RandomGen.random_chance(0.2):
                 cave.remove_quantity(RandomGen.random_float() * cave.quantity)
             else:
-                cave.add_quantity(RandomGen.random_float() * 10, 2)
+                cave.add_quantity(round(RandomGen.random_float() * 10, 2))
             cave.quantity = round(cave.quantity, 2)
 
 class SoloGame(Game):
@@ -190,7 +190,7 @@ class MultiplayerGame(Game):
         """
         raise NotImplementedError()
 
-    def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
+    def verify_output_and_update_quantities(self, foods: list[Food | None], balances: list[float], caves: list[tuple[Cave, float]|None]) -> None:
         raise NotImplementedError()
 
 if __name__ == "__main__":
