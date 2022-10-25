@@ -22,7 +22,9 @@ class Game:
     MAX_FOOD = 5
 
     def __init__(self) -> None:
-        raise NotImplementedError()
+        self.materials = []
+        self.caves = []
+        self.traders = []
 
     def initialise_game(self) -> None:
         """Initialise all game objects: Materials, Caves, Traders."""
@@ -45,22 +47,22 @@ class Game:
         self.set_traders(traders)
 
     def set_materials(self, mats: list[Material]) -> None:
-        raise NotImplementedError()
+        self.materials = mats
 
     def set_caves(self, caves: list[Cave]) -> None:
-        raise NotImplementedError()
+        self.caves = caves
 
     def set_traders(self, traders: list[Trader]) -> None:
-        raise NotImplementedError()
+        self.traders = traders
 
     def get_materials(self) -> list[Material]:
-        raise NotImplementedError()
+        return self.materials
 
     def get_caves(self) -> list[Cave]:
-        raise NotImplementedError()
+        return self.caves
 
     def get_traders(self) -> list[Trader]:
-        raise NotImplementedError()
+        return self.traders
 
     def generate_random_materials(self, amount):
         """
@@ -97,7 +99,7 @@ class Game:
             if cave.quantity > 0 and RandomGen.random_chance(0.2):
                 cave.remove_quantity(RandomGen.random_float() * cave.quantity)
             else:
-                cave.add_quantity(round(RandomGen.random_float() * 10, 2))
+                cave.add_quantity(RandomGen.random_float() * 10, 2)
             cave.quantity = round(cave.quantity, 2)
 
 class SoloGame(Game):
@@ -118,7 +120,7 @@ class SoloGame(Game):
 
     def simulate_day(self):
         # 1. Traders make deals
-        raise NotImplementedError()
+        Trader.generate_deal()
         print("Traders Deals:\n\t", end="")
         print("\n\t".join(map(str, self.get_traders())))
         # 2. Food is offered
@@ -190,7 +192,7 @@ class MultiplayerGame(Game):
         """
         raise NotImplementedError()
 
-    def verify_output_and_update_quantities(self, foods: list[Food | None], balances: list[float], caves: list[tuple[Cave, float]|None]) -> None:
+    def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
         raise NotImplementedError()
 
 if __name__ == "__main__":
