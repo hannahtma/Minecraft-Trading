@@ -94,6 +94,9 @@ class Material:
         self.name = name
         self.mining_rate = mining_rate
     
+    def get_mining_rate(self):
+        return self.mining_rate
+    
     def __str__(self) -> str:
         material_string = f"{self.name}, {self.mining_rate}"
         return material_string
