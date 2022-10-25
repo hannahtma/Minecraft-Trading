@@ -71,26 +71,44 @@ TRADER_NAMES = [
 class Trader(ABC):
     
     def __init__(self, name: str) -> None:
-        raise NotImplementedError()
+        self.buy_price = 0
+        self.material_selected = None
+
+        if name not in TRADER_NAMES:
+            self.name = Trader.random_trader()
+        else:
+            self.name = name
+
+        self.materials = []
 
     @classmethod
     def random_trader(cls):
-        raise NotImplementedError()
+        return RandomGen.random_choice(TRADER_NAMES)
     
+    def get_materials(self):
+        return self.materials
+
     def set_all_materials(self, mats: list[Material]) -> None:
-        raise NotImplementedError()
+        self.materials = mats
     
     def add_material(self, mat: Material) -> None:
-        raise NotImplementedError()
+        self.materials.append(mat)
     
     def is_currently_selling(self) -> bool:
-        raise NotImplementedError()
+        return self.materials
 
     def current_deal(self) -> tuple[Material, float]:
         raise NotImplementedError()
     
+    def get_buy_price(self):
+        return self.buy_price
+    
+    def get_selected_material(self):
+        return self.material_selected
+    
+    @abstractmethod
     def generate_deal(self) -> None:
-        raise NotImplementedError()
+        pass
 
     def stop_deal(self) -> None:
         raise NotImplementedError()
@@ -100,12 +118,28 @@ class Trader(ABC):
 
 class RandomTrader(Trader):
     
-    pass
-
+    def generate_deal(self) -> None:
+        self.material_selected =  RandomGen.random_choice(self.get_materials())
+        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+    
 class RangeTrader(Trader):
+
+    def sortFn(self, material_list):
+        return material_list
+
+    def generate_deal(self) -> None:
+        self.materials.sort(reverse=False)
+        i = RandomGen.randint(1,len(self.materials))
+        j = RandomGen.randint(i,len(self.materials))
+        self.material_selected = RandomGen.random_choice(RangeTrader.materials_between(i,j))
+        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
     
     def materials_between(self, i: int, j: int) -> list[Material]:
-        raise NotImplementedError()
+        materials_between_list = []
+        for index in range(i-1, j):
+            materials_between_list.append(self.materials[index])
+
+        return materials_between_list
 
 class HardTrader(Trader):
     
