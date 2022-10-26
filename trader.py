@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from material import Material
 from random_gen import RandomGen
+from avl import AVLTree
 
 # Generated with https://www.namegenerator.co/real-names/english-name-generator
 TRADER_NAMES = [
@@ -81,16 +82,18 @@ class Trader(ABC):
         return RandomGen.random_choice(TRADER_NAMES)
     
     def set_all_materials(self, mats: list[Material]) -> None:
-        self.materials = mats
+        self.materials = AVLTree()
+        for material in mats:
+            self.materials.insert_aux(None,material.get_mining_rate(),material)
     
     def add_material(self, mat: Material) -> None:
-        self.materials.append(mat)
+        self.materials.insert_aux(None,mat.get_mining_rate(),mat)
     
     def is_currently_selling(self) -> bool:
-        return self.materials
+        pass
 
     def current_deal(self) -> tuple[Material, float]:
-        raise NotImplementedError()
+        return tuple(self.material_selected)
     
     @abstractmethod
     def generate_deal(self) -> None:
@@ -114,18 +117,13 @@ class RangeTrader(Trader):
         return material_list
 
     def generate_deal(self) -> None:
-        self.materials.sort(reverse=False)
         i = RandomGen.randint(1,len(self.materials))
         j = RandomGen.randint(i,len(self.materials))
         self.material_selected = RandomGen.random_choice(RangeTrader.materials_between(i,j))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
     
     def materials_between(self, i: int, j: int) -> list[Material]:
-        materials_between_list = []
-        for index in range(i-1, j):
-            materials_between_list.append(self.materials[index])
-
-        return materials_between_list
+        return self.materials.range_between(i,j)
 
 class HardTrader(Trader):
     
