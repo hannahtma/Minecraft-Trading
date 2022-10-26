@@ -50,7 +50,11 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
     def insert_aux(self, current: AVLTreeNode, key: K, item: I) -> AVLTreeNode:
         """
             Attempts to insert an item into the tree, it uses the Key to insert it
-            
+
+            :complexity best: O(CompK) inserts the item at the root.
+            :complexity worst: O(CompK * D) inserting at the bottom of the tree
+            where D is the depth of the tree
+            CompK is the complexity of comparing the keys
         """
         if current is None:  # base case: at the leaf
             current = AVLTreeNode(key, item)
@@ -74,6 +78,11 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         """
             Attempts to delete an item from the tree, it uses the Key to
             determine the node to delete.
+
+            :complexity best: O(CompK) deletes the item at the root.
+            :complexity worst: O(CompK * D) deletes at the bottom of the tree
+            where D is the depth of the tree
+            CompK is the complexity of comparing the keys
         """
         if current is None:  # key not found
             raise ValueError('Deleting non-existent item')

@@ -89,45 +89,102 @@ class Trader(ABC):
     def add_material(self, mat: Material) -> None:
         self.materials.insert_aux(None,mat.get_mining_rate(),mat)
     
+    @abstractmethod
     def is_currently_selling(self) -> bool:
         pass
 
+    @abstractmethod
     def current_deal(self) -> tuple[Material, float]:
-        return tuple(self.material_selected)
+        pass
     
     @abstractmethod
     def generate_deal(self) -> None:
         pass
 
     def stop_deal(self) -> None:
-        raise NotImplementedError()
+        self.deal = None
     
+    @abstractmethod
     def __str__(self) -> str:
-        raise NotImplementedError()
+        pass
 
 class RandomTrader(Trader):
+
+    def __init__(self, name):
+        self.trader_name = name
+        self.material_selected = Material("",0)
+        self.buy_price = 0
     
     def generate_deal(self) -> None:
-        self.material_selected =  RandomGen.random_choice(self.materials)
+        self.material_selected = RandomGen.random_choice(self.materials)
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+
+    def current_deal(self) -> tuple[Material, float]:
+        self.deal = tuple(self.material_selected, self.buy_price)
+        return self.deal
+
+    def is_currently_selling(self) -> bool:
+        if self.deal != None:
+            return True
+        else:
+            return False
+
+    def __str__(self) -> str:
+        return f"<RandomTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate}🍗/💎] for {self.buy_price}💰>"
 
 class RangeTrader(Trader):
 
-    def sortFn(self, material_list):
-        return material_list
+    def __init__(self, name):
+        self.trader_name = name
+        self.material_selected = Material("",0)
+        self.buy_price = 0
 
     def generate_deal(self) -> None:
-        i = RandomGen.randint(1,len(self.materials))
-        j = RandomGen.randint(i,len(self.materials))
+        i = RandomGen.randint(1,self.materials.__len__())
+        j = RandomGen.randint(i,self.materials.__len__())
         self.material_selected = RandomGen.random_choice(RangeTrader.materials_between(i,j))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
     
     def materials_between(self, i: int, j: int) -> list[Material]:
         return self.materials.range_between(i,j)
 
+    def current_deal(self) -> tuple[Material, float]:
+        self.deal = tuple(self.material_selected, self.buy_price)
+        return self.deal
+
+    def is_currently_selling(self) -> bool:
+        if self.deal != None:
+            return True
+        else:
+            return False
+
+    def __str__(self) -> str:
+        return f"<RangeTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate}🍗/💎] for {self.buy_price}💰>"
+
 class HardTrader(Trader):
+
+    def __init__(self, name):
+        self.trader_name = name
+        self.material_selected = Material("",0)
+        self.buy_price = 0
     
-    pass
+    def generate_deal(self) -> None:
+        self.material_selected = self.materials.get_maximal(self.materials.root)
+        self.materials.__delitem__(self.material_selected.key)
+        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+
+    def current_deal(self) -> tuple[Material, float]:
+        self.deal = tuple(self.material_selected, self.buy_price)
+        return self.deal
+
+    def is_currently_selling(self) -> bool:
+        if self.deal != None:
+            return True
+        else:
+            return False
+
+    def __str__(self) -> str:
+        return f"<HardTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate}🍗/💎] for {self.buy_price}💰>"
 
 if __name__ == "__main__":
     trader = RangeTrader("Jackson")
