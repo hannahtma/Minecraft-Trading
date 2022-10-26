@@ -82,7 +82,6 @@ class Trader(ABC):
         return RandomGen.random_choice(TRADER_NAMES)
     
     def set_all_materials(self, mats: list[Material]) -> None:
-        self.materials = AVLTree()
         for material in mats:
             self.materials.insert_aux(None,material.get_mining_rate(),material)
     
@@ -114,13 +113,16 @@ class RandomTrader(Trader):
         self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
+        self.materials = AVLTree()
     
     def generate_deal(self) -> None:
         self.material_selected = RandomGen.random_choice(self.materials)
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
 
     def current_deal(self) -> tuple[Material, float]:
-        self.deal = tuple(self.material_selected, self.buy_price)
+        if self.material_selected == Material("",0) or self.buy_price == 0:
+            raise ValueError("The deal has not been generated")
+        self.deal = tuple((self.material_selected, self.buy_price))
         return self.deal
 
     def is_currently_selling(self) -> bool:
@@ -138,18 +140,21 @@ class RangeTrader(Trader):
         self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
+        self.materials = AVLTree()
 
     def generate_deal(self) -> None:
         i = RandomGen.randint(1,self.materials.__len__())
         j = RandomGen.randint(i,self.materials.__len__())
-        self.material_selected = RandomGen.random_choice(RangeTrader.materials_between(i,j))
+        self.material_selected = RandomGen.random_choice(self.materials_between(i,j))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
     
     def materials_between(self, i: int, j: int) -> list[Material]:
-        return self.materials.range_between(i,j)
+        return self.materials.range_between(i-1,j-1)
 
     def current_deal(self) -> tuple[Material, float]:
-        self.deal = tuple(self.material_selected, self.buy_price)
+        if self.material_selected == Material("",0) or self.buy_price == 0:
+            raise ValueError("The deal has not been generated")
+        self.deal = tuple((self.material_selected, self.buy_price))
         return self.deal
 
     def is_currently_selling(self) -> bool:
@@ -167,14 +172,17 @@ class HardTrader(Trader):
         self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
+        self.materials = AVLTree()
     
     def generate_deal(self) -> None:
-        self.material_selected = self.materials.get_maximal(self.materials.root)
+        self.material_selected = self.materials.get_maximal(self.materials.get_root())
         self.materials.__delitem__(self.material_selected.key)
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
 
     def current_deal(self) -> tuple[Material, float]:
-        self.deal = tuple(self.material_selected, self.buy_price)
+        if self.material_selected == Material("",0) or self.buy_price == 0:
+            raise ValueError("The deal has not been generated")
+        self.deal = tuple((self.material_selected, self.buy_price))
         return self.deal
 
     def is_currently_selling(self) -> bool:

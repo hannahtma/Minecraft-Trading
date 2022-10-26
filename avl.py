@@ -25,6 +25,9 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
 
         BinarySearchTree.__init__(self)
 
+    def get_root(self) -> AVLTreeNode:
+        return self.root
+
     def get_height(self, current: AVLTreeNode) -> int:
         """
             Get the height of a node. Return current.height if current is
@@ -188,7 +191,6 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
 
         return new_root
-
 
     def rebalance(self, current: AVLTreeNode) -> AVLTreeNode:
         """ Compute the balance of the current node.
