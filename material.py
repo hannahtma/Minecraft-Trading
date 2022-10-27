@@ -87,25 +87,56 @@ RANDOM_MATERIAL_NAMES = [
 
 class Material:
     """
-
+    Creates materials in a certain format
     """
     
     def __init__(self, name: str, mining_rate: float) -> None:
+        """
+        Initialises variables
+
+        Parameters:
+            name - Name of the material
+            mining_rate - How much hunger bars it takes to mine the material
+
+        Complexity: O(1)
+        """
+        if name == None or mining_rate == None:
+            self.random_material()
         self.name = name
         self.mining_rate = mining_rate
 
     def get_mining_rate(self):
+        """
+        Getter for mining rate
+
+        Complexity: O(1)
+        """
         return self.mining_rate
 
     def get_name(self):
+        """
+        Getter for name
+
+        Complexity: O(1)
+        """
         return self.name
     
     def __str__(self) -> str:
+        """
+        Creates a string representation of the class
+
+        Complexity: O(1)
+        """
         return f"{self.name} {self.mining_rate}"
 
     @classmethod
     def random_material(cls):
-        return RandomGen.random_choice(RANDOM_MATERIAL_NAMES)
+        """
+        Randomizes a material and it's mining rate
+
+        Complexity: O(1)
+        """
+        return Material(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(RandomGen.random_float(),2))
 
 if __name__ == "__main__":
     print(Material.random_material())
