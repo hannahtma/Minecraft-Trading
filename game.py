@@ -1,4 +1,7 @@
 from __future__ import annotations
+from abc import abstractmethod
+from hash_table import LinearProbeTable
+from node import TreeNode
 
 from player import Player
 from trader import Trader
@@ -6,6 +9,7 @@ from material import Material
 from cave import Cave
 from food import Food
 from random_gen import RandomGen
+from avl import AVLTree
 
 class Game:
 
@@ -22,9 +26,8 @@ class Game:
     MAX_FOOD = 5
 
     def __init__(self) -> None:
-        self.materials = []
-        self.caves = []
-        self.traders = []
+        self.materials = AVLTree()
+        self.traders = AVLTree()
 
     def initialise_game(self) -> None:
         """Initialise all game objects: Materials, Caves, Traders."""
@@ -47,14 +50,22 @@ class Game:
         self.set_traders(traders)
 
     def set_materials(self, mats: list[Material]) -> None:
-        self.materials = mats
+        for material in mats:
+            self.materials.__setitem__(material.get_mining_rate(), material)
 
     def set_caves(self, caves: list[Cave]) -> None:
-        self.caves = caves
+        self.caves = LinearProbeTable(len(caves)-1)
+        for cave in caves:
+            # print(cave)
+            # self.caves.__setitem__(cave.get_quantity(), cave)
+            self.caves.insert(cave.get_material().get_name(), cave)
+        print(self.caves)
 
     def set_traders(self, traders: list[Trader]) -> None:
-        self.traders = traders
-
+        for trader in traders:
+            trader_object = TreeNode(trader.get_buy_price(), trader)
+            self.traders.__setitem__(trader_object.key, trader_object.item)
+        
     def get_materials(self) -> list[Material]:
         return self.materials
 
@@ -70,7 +81,8 @@ class Game:
         Generated materials must all have different names and different mining_rates.
         (You may have to call Material.random_material more than <amount> times.)
         """
-        raise NotImplementedError()
+        for _ in range(amount):
+            Material.random_material() 
 
     def generate_random_caves(self, amount):
         """
@@ -78,7 +90,8 @@ class Game:
         Generated caves must all have different names
         (You may have to call Cave.random_cave more than <amount> times.)
         """
-        raise NotImplementedError()
+        for _ in range(amount):
+            Cave.random_cave()
 
     def generate_random_traders(self, amount):
         """
@@ -88,7 +101,11 @@ class Game:
         Generated traders must all have different names
         (You may have to call <TraderClass>.random_trader() more than <amount> times.)
         """
-        raise NotImplementedError()
+        for _ in range(amount):
+            trader = Trader.random_trader()
+            self.traders.__setitem__(trader)
+        
+        return self.traders
 
     def finish_day(self):
         """
@@ -138,7 +155,8 @@ class SoloGame(Game):
         self.verify_output_and_update_quantities(food, balance, caves)
 
     def verify_output_and_update_quantities(self, food: Food | None, balance: float, caves: list[tuple[Cave, float]]) -> None:
-        raise NotImplementedError()
+        if self.player.get_balance() > food.get_price():
+            food_purchasable = True
 
 class MultiplayerGame(Game):
 
@@ -190,22 +208,31 @@ class MultiplayerGame(Game):
     def select_for_players(self, food: Food) -> tuple[list[Food|None], list[float], list[tuple[Cave, float]|None]]:
         """
         """
-        raise NotImplementedError()
+        food_list = []
+        for player in self.players:
+            if player.get_balance() >= food.get_price():
+                food_list.append(food)
+            else:
+                food_list.append(None)
+        
+            playe
 
     def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
         raise NotImplementedError()
 
 if __name__ == "__main__":
 
-    r = RandomGen.seed # Change this to set a fixed seed.
-    RandomGen.set_seed(r)
-    print(r)
+    # r = RandomGen.seed # Change this to set a fixed seed.
+    # RandomGen.set_seed(r)
+    # print(r)
 
-    g = SoloGame()
-    g.initialise_game()
+    # g = SoloGame()
+    # g.initialise_game()
 
-    g.simulate_day()
-    g.finish_day()
+    # g.simulate_day()
+    # g.finish_day()
 
-    g.simulate_day()
-    g.finish_day()
+    # g.simulate_day()
+    # g.finish_day()
+
+    print("this is money: 💰💰💰💰💰")
