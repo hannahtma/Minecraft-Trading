@@ -80,6 +80,9 @@ class Trader(ABC):
             self.name = name
 
         self.materials = []
+    
+    def sell(self, a_tuple: tuple):
+        (self.material_selected, self.buy_price) = a_tuple
 
     @classmethod
     def random_trader(cls):
@@ -114,7 +117,7 @@ class Trader(ABC):
         raise NotImplementedError()
     
     def __str__(self) -> str:
-        raise NotImplementedError()
+        return f"{self.name}: {self.material_selected}, for {self.buy_price} hunger bars"
 
 class RandomTrader(Trader):
     
