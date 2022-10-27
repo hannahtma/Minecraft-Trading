@@ -43,10 +43,11 @@ class LinearProbeTable(Generic[T]):
         self.tablesize = tablesize_override
 
         self.iterator = LargestPrimeIterator(self.expected_size, self.tablesize)
-        self.next_prime = self.iterator.__next__()
+        self.next_prime = next(self.iterator)
+        print("what is it?",self.next_prime)
 
         if self.tablesize == -1:
-            self.tablesize = expected_size
+            self.tablesize = self.expected_size
 
         self.table = ArrayR(max(self.MIN_CAPACITY, self.tablesize))
         
@@ -102,7 +103,7 @@ class LinearProbeTable(Generic[T]):
             :raises KeyError: When a position can't be found
         """
         position = self.hash(key)  # get the position using hash
-        # print("position", key, position)
+        print("HASHED POSITION", key, position)
         # print("tablesize", self.tablesize)
 
         if is_insert and self.is_full():
@@ -186,7 +187,7 @@ class LinearProbeTable(Generic[T]):
         """
 
         position = self._linear_probe(key, True)
-        # print(position)
+        # print("POSITION IS HERE:" ,position, key)
 
         if self.__len__() > self.tablesize // 2:
             self._rehash()
@@ -226,9 +227,9 @@ class LinearProbeTable(Generic[T]):
         """
 
         self.rehash_count += 1
-        # print(self.rehash_count)
-        self.next_prime = self.iterator.__next__()
-        # print(self.next_prime)
+        print("REHASH COUNT?" ,self.rehash_count)
+        self.next_prime = next(self.iterator)
+        print("DOES THE SELF PRIME INCREASE?",self.next_prime)
         new_hash = LinearProbeTable(self.expected_size, self.next_prime)
 
         for item in range(len(self.table)):
