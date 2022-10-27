@@ -76,6 +76,7 @@ class Trader(ABC):
             self.name = Trader.random_trader()
         else:
             self.name = name
+        self.key_list = []
 
     @classmethod
     def random_trader(cls):
@@ -84,9 +85,12 @@ class Trader(ABC):
     def set_all_materials(self, mats: list[Material]) -> None:
         for material in mats:
             self.materials.insert_aux(None,material.get_mining_rate(),material)
+            self.key_list.append(material.get_mining_rate())
     
     def add_material(self, mat: Material) -> None:
         self.materials.insert_aux(None,mat.get_mining_rate(),mat)
+        self.key_list.append(mat.get_mining_rate())
+        
     
     @abstractmethod
     def is_currently_selling(self) -> bool:
@@ -116,7 +120,7 @@ class RandomTrader(Trader):
         self.materials = AVLTree()
     
     def generate_deal(self) -> None:
-        self.material_selected = RandomGen.random_choice(self.materials)
+        self.material_selected = self.materials.__getitem__(RandomGen.random_choice(self.key_list))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
 
     def current_deal(self) -> tuple[Material, float]:
@@ -149,7 +153,8 @@ class RangeTrader(Trader):
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
     
     def materials_between(self, i: int, j: int) -> list[Material]:
-        return self.materials.range_between(i-1,j-1)
+        self.key_list.sort()
+        return self.materials.range_between(self.key_list[i-1],self.key_list[j-1])
 
     def current_deal(self) -> tuple[Material, float]:
         if self.material_selected == Material("",0) or self.buy_price == 0:
