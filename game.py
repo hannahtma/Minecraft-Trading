@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import abstractmethod
+from xml.etree.ElementPath import xpath_tokenizer_re
 from hash_table import LinearProbeTable
 from node import TreeNode
 
@@ -48,23 +49,18 @@ class Game:
         self.set_materials(materials)
         self.set_caves(caves)
         self.set_traders(traders)
-
+    
+    @abstractmethod
     def set_materials(self, mats: list[Material]) -> None:
-        for material in mats:
-            self.materials.__setitem__(material.get_mining_rate(), material)
+        pass
 
+    @abstractmethod
     def set_caves(self, caves: list[Cave]) -> None:
-        self.caves = LinearProbeTable(len(caves)-1)
-        for cave in caves:
-            # print(cave)
-            # self.caves.__setitem__(cave.get_quantity(), cave)
-            self.caves.insert(cave.get_material().get_name(), cave)
-        print(self.caves)
+        pass
 
+    @abstractmethod
     def set_traders(self, traders: list[Trader]) -> None:
-        for trader in traders:
-            trader_object = TreeNode(trader.get_buy_price(), trader)
-            self.traders.__setitem__(trader_object.key, trader_object.item)
+        pass
         
     def get_materials(self) -> list[Material]:
         return self.materials
@@ -91,7 +87,7 @@ class Game:
         (You may have to call Cave.random_cave more than <amount> times.)
         """
         for _ in range(amount):
-            Cave.random_cave()
+            Cave.random_cave(self.get_materials())
 
     def generate_random_traders(self, amount):
         """
@@ -157,6 +153,28 @@ class SoloGame(Game):
     def verify_output_and_update_quantities(self, food: Food | None, balance: float, caves: list[tuple[Cave, float]]) -> None:
         if self.player.get_balance() > food.get_price():
             food_purchasable = True
+
+    def set_materials(self, mats: list[Material]) -> None:
+        print("materials AAAAAAA")
+        for material in mats:
+            self.materials.__setitem__(material.get_mining_rate(), material)
+
+    def set_caves(self, caves: list[Cave]) -> None:
+        print("caves AAAAAAA")
+        self.caves = LinearProbeTable(len(caves)-1)
+        for cave in caves:
+            print("THIS IS OUR CAVE: ",cave)
+            # self.caves.__setitem__(cave.get_quantity(), cave)
+            print(cave.get_material().get_name())
+            self.caves.__setitem__(cave.get_material().get_name(), cave)
+        
+        print("this is self.caves: ",str(self.caves))
+
+    def set_traders(self, traders: list[Trader]) -> None:
+        print("traders AAAAA")
+        for trader in traders:
+            trader_object = TreeNode(trader.get_buy_price(), trader)
+            self.traders.__setitem__(trader_object.key, trader_object.item)
 
 class MultiplayerGame(Game):
 
