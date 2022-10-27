@@ -100,7 +100,8 @@ class Material:
 
         Complexity: O(1)
         """
-        if name == None or mining_rate == None:
+        if name == None or mining_rate == None: 
+            # when there are empty values, randomizes material name and mining rate
             self.random_material()
         self.name = name
         self.mining_rate = mining_rate
