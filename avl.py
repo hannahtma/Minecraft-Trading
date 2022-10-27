@@ -26,6 +26,11 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         BinarySearchTree.__init__(self)
 
     def get_root(self) -> AVLTreeNode:
+        """
+        Returns the root of the tree
+
+        Complexity: O(1)
+        """
         return self.root
 
     def get_height(self, current: AVLTreeNode) -> int:
