@@ -47,6 +47,22 @@ class TestHashTable(unittest.TestCase):
         self.assertGreaterEqual(probe_max, 3)    # Jon: 3  + Whatever rehash caused
         self.assertEqual(rehash, 1)              # 1 rehash
 
+    def test_stats(self):
+        table = LinearProbeTable(48, tablesize_override = FIX_TABLESIZE)
+        f = open("asia_countries.txt", "r")
+        lst = (f.read().split("\n"))
+        
+        for name in lst:
+            table[name] = name + "-value"
+        
+        f.close()
+        
+        conflict, probe_total, probe_max, rehash = table.statistics()
+        self.assertGreaterEqual(conflict, )
+        self.assertGreaterEqual(probe_total, )
+        self.assertGreaterEqual(probe_max, )
+        self.assertGreaterEqual(rehash, )
+
 if __name__ == '__main__':
 
     # running all the tests
