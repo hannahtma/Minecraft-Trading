@@ -106,8 +106,8 @@ class Material:
 
     @classmethod
     def random_material(cls):
-        name = RandomGen(0, 81)
-        mining_rate = RandomGen(0.0, 1000000.0)
+        name = RandomGen.random_choice(RANDOM_MATERIAL_NAMES)
+        mining_rate = RandomGen.random_float()
 
         return Material(name, mining_rate)
 
