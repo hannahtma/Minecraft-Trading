@@ -94,6 +94,9 @@ class Material:
         self.name = name
         self.mining_rate = mining_rate
     
+    def get_name(self):
+        return self.name
+
     def get_mining_rate(self):
         return self.mining_rate
     
