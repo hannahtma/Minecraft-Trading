@@ -10,6 +10,37 @@ class TestTraders(unittest.TestCase):
     def setUp(self):
         pass
 
+    def test_material_methods(self):
+        t = RandomTrader.random_trader()
+        a, b, c = [
+            Material("Arrow", 1),
+            Material("Axe", 2),
+            Material("Bow", 3),
+        ]
+        t.set_all_materials([a, b])
+        self.assertFalse(t.is_currently_selling())
+        # Make a deal. The material in the deal should be either a or b.
+        t.generate_deal()
+        self.assertTrue(t.is_currently_selling())
+        self.assertIn(t.current_deal()[0], [a, b])
+        t.add_material(c)
+        # Now the trader has access to a, b and c.
+        t.generate_deal()
+        self.assertTrue(t.is_currently_selling())
+        self.assertIn(t.current_deal()[0], [a, b, c])
+        t.stop_deal()
+        self.assertFalse(t.is_currently_selling())
+        t.set_all_materials([a])
+        # This resets the traders inventory to just a.
+        t.generate_deal()
+        self.assertTrue(t.is_currently_selling())
+        self.assertIn(t.current_deal()[0], [a])
+        t.add_material(c)
+        # And now we have access to a and c.
+        t.generate_deal()
+        self.assertTrue(t.is_currently_selling())
+        self.assertIn(t.current_deal()[0], [a, c])
+
     def test_init(self):
         # checking a valid random trader being created
         try:

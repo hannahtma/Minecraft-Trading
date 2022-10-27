@@ -119,8 +119,8 @@ class RandomTrader(Trader):
         self.key_list = []
     
     def generate_deal(self) -> None:
-        self.material_selected = self.materials.__getitem__(RandomGen.random_choice(self.key_list))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+        self.material_selected = self.materials.__getitem__(RandomGen.random_choice(self.key_list))
 
     def current_deal(self) -> tuple[Material, float]:
         if self.material_selected == Material("",0) or self.buy_price == 0:
@@ -173,7 +173,7 @@ class RangeTrader(Trader):
             return False
 
     def __str__(self) -> str:
-        return f"<RangeTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}] for {self.buy_price}>"
+        return f"<RangeTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
 
 class HardTrader(Trader):
 

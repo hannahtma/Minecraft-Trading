@@ -102,7 +102,8 @@ class TestGame(unittest.TestCase):
             for _ in range(400)
         ]
         mat_set = set()
-        materials = list(filter(lambda x: x.name not in mat_set and mat_set.add(x.name) is None, materials))
+        mining_set = set()
+        materials = list(filter(lambda x: (x.name not in mat_set and x.mining_rate not in mining_set) and (mat_set.add(x.name) or mining_set.add(x.mining_rate)) is None, materials))
         caves = [
             Cave.random_cave(materials)
             for _ in range(400)
