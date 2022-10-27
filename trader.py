@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
+from random import Random
+from unicodedata import name
 from material import Material
 from random_gen import RandomGen
 from avl import AVLTree
@@ -71,17 +73,19 @@ TRADER_NAMES = [
 
 class Trader(ABC):
     
-    def __init__(self, name: str) -> None:
-        if name not in TRADER_NAMES:
-            self.name = Trader.random_trader()
+    def __init__(self, name: str = None) -> None:
+        if name == None:
+            self.name = RandomGen.random_choice(TRADER_NAMES)
         else:
             self.name = name
 
     @classmethod
     def random_trader(cls):
-        return RandomGen.random_choice(TRADER_NAMES)
+        return RandomGen.random_choice([RandomTrader(),RangeTrader(),HardTrader()])
     
     def set_all_materials(self, mats: list[Material]) -> None:
+        self.materials = AVLTree()
+        self.key_list = []
         for material in mats:
             self.materials.__setitem__(material.get_mining_rate(),material)
             self.key_list.append(material.get_mining_rate())
@@ -111,16 +115,18 @@ class Trader(ABC):
 
 class RandomTrader(Trader):
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
         self.key_list = []
+        self.deal = None
     
     def generate_deal(self) -> None:
-        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
         self.material_selected = self.materials.__getitem__(RandomGen.random_choice(self.key_list))
+        self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+        self.current_deal()
 
     def current_deal(self) -> tuple[Material, float]:
         if self.material_selected == Material("",0) or self.buy_price == 0:
@@ -139,25 +145,28 @@ class RandomTrader(Trader):
 
 class RangeTrader(Trader):
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
         self.key_list = []
+        self.deal = None
 
     def generate_deal(self) -> None:
-        i = RandomGen.randint(1,self.materials.__len__()-1)
-        j = RandomGen.randint(i,self.materials.__len__()-1)
-        self.material_selected = self.materials.__getitem__(RandomGen.random_choice(self.materials_between(i,j)))
+        if self.materials.__len__() <= 1:
+            self.material_selected = self.materials.__getitem__(self.key_list[0])
+        else:
+            i = RandomGen.randint(0,self.materials.__len__()-1)
+            j = RandomGen.randint(i,self.materials.__len__()-1)
+            self.material_selected = RandomGen.random_choice(self.materials_between(i,j))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+        self.current_deal()
     
     def materials_between(self, i: int, j: int) -> list[Material]:
-        self.key_list.sort()
         the_list = []
         for index in range(j-i+1):
-            the_list.append(self.key_list[i+index-1])
-        print(the_list)
+            the_list.append(self.materials.__getitem__(self.key_list[i+index]))
         return the_list
 
     def current_deal(self) -> tuple[Material, float]:
@@ -177,17 +186,19 @@ class RangeTrader(Trader):
 
 class HardTrader(Trader):
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
         self.key_list = []
+        self.deal = None
     
     def generate_deal(self) -> None:
         self.material_selected = (self.materials.get_maximal(self.materials.get_root())).item
         self.materials.__delitem__(self.material_selected.get_mining_rate())
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
+        self.current_deal()
 
     def current_deal(self) -> tuple[Material, float]:
         if self.material_selected == Material("",0) or self.buy_price == 0:
@@ -215,6 +226,8 @@ if __name__ == "__main__":
     rando.add_material(Material("Clock", 6))
     rando.add_material(Material("Pickaxe", 7))
     rando.add_material(Material("Gunpowder", 8))
+
     rando.generate_deal()
     print(rando)
+
 

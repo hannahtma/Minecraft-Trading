@@ -91,10 +91,7 @@ class Material:
     """
     
     def __init__(self, name: str, mining_rate: float) -> None:
-        if name not in RANDOM_MATERIAL_NAMES:
-            self.name = Material.random_material()
-        else:
-            self.name = name
+        self.name = name
         self.mining_rate = mining_rate
 
     def get_mining_rate(self):
