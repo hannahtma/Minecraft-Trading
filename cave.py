@@ -127,15 +127,16 @@ class Cave:
         return cave_string
 
         # Caves = [
-    # (<Cave: Castle Karstaag Ruins. 4 of [Netherite Ingot: 20.95🍗/💎]>, 4.0), 
-    # (<Cave: Red Eagle Redoubt. 3 of [Fishing Rod: 26.93🍗/💎]>, 3.0),
-    # (<Cave: Glacial Cave. 3 of [Gold Nugget: 27.24🍗/💎]>, 3.0), 
-    # (<Cave: Boulderfall Cave. 10 of [Prismarine Crystal: 11.48🍗/💎]>, 10.0), 
-    # (<Cave: Orotheim. 6 of [Fishing Rod: 26.93🍗/💎]>, 2.335313776457482), 
-# ]
+        # (<Cave: Castle Karstaag Ruins. 4 of [Netherite Ingot: 20.95🍗/💎]>, 4.0), 
+        # (<Cave: Red Eagle Redoubt. 3 of [Fishing Rod: 26.93🍗/💎]>, 3.0),
+        # (<Cave: Glacial Cave. 3 of [Gold Nugget: 27.24🍗/💎]>, 3.0), 
+        # (<Cave: Boulderfall Cave. 10 of [Prismarine Crystal: 11.48🍗/💎]>, 10.0), 
+        # (<Cave: Orotheim. 6 of [Fishing Rod: 26.93🍗/💎]>, 2.335313776457482), 
+        # ]
 
     @classmethod
     def random_cave(self, material_list: list[Material]) -> Cave:
+        self.material = RandomGen.random_choice(material_list)
         return f"{self.name}. {self.quantity} of [{self.material}]"
 
 if __name__ == "__main__":
