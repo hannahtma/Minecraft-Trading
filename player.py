@@ -108,6 +108,9 @@ class Player():
 
     def set_traders(self, traders_list: list[Trader]) -> None:
         self.traders_list = traders_list
+        # print("This is trader list:")
+        # for x in self.traders_list:
+        #     print(x)
 
     def set_foods(self, foods_list: list[Food]) -> None:
         for food in foods_list:
@@ -143,26 +146,30 @@ class Player():
 
         self.hunger_bars = food_choice.item.get_hunger_bars()
         self.balance -= food_choice.item.get_price()
+        print("hunger bars", self.hunger_bars)
+        print("balance: ", self.balance)
 
-        while self.hunger_bars > 0:
+        while self.hunger_bars > 0 and self.traders_list.is_empty() == False:
             print("current self.hunger_bars:", self.hunger_bars)
             print("current self.balance:", self.balance)
 
             best_price = self.traders_list.get_maximal(self.traders_list.root)
             self.traders_list.__delitem__(best_price.key)
-            for x in self.traders_list:
-                print("trader",x)
+            # for x in self.traders_list:
+            #     print("trader",x)
             print("best price: ", best_price)
 
             item_to_buy = best_price.item.get_selected_material()
             print("item to buy: ", item_to_buy)
 
+            print("this is self.caves_list: ")
             print(self.caves_list)
 
             if self.caves_list.__contains__(item_to_buy.get_name()):
                 the_cave = self.caves_list.__getitem__(item_to_buy.get_name())
                 self.caves.append(the_cave)
                 self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
+                print("after purchase: ", self.hunger_bars)
                 self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
         
         return (food_choice, self.balance, self.caves)
