@@ -136,8 +136,11 @@ class Cave:
 
     @classmethod
     def random_cave(self, material_list: list[Material]) -> Cave:
-        self.material = RandomGen.random_choice(material_list)
-        return f"{self.name}. {self.quantity} of [{self.material}]"
+        random_name = RandomGen.random_choice(CAVE_NAMES)
+        random_material = RandomGen.random_choice(material_list)
+
+        return Cave(random_name, random_material)
+
 
 if __name__ == "__main__":
     print(Cave("Mt Coronet", Material("Coal", 4.5), 3))
