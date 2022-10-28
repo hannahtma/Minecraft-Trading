@@ -6,6 +6,7 @@ from material import Material
 from cave import Cave
 from food import Food
 from random_gen import RandomGen
+from avl import AVLTree
 
 class Game:
 
@@ -45,13 +46,21 @@ class Game:
         self.set_traders(traders)
 
     def set_materials(self, mats: list[Material]) -> None:
-        raise NotImplementedError()
+        self.materials = AVLTree()
+        self.materials_key_list = []
+        for material in mats:
+            self.materials.__setitem__(material.get_mining_rate(),material) 
+            self.materials_key_list.append(material.get_mining_rate())
 
     def set_caves(self, caves: list[Cave]) -> None:
-        raise NotImplementedError()
+        pass
 
     def set_traders(self, traders: list[Trader]) -> None:
-        raise NotImplementedError()
+        self.traders = AVLTree()
+        self.traders_key_list = []
+        for trader in traders:
+            self.traders.__setitem__(trader.get_buy_price(),trader) 
+            self.traders_key_list.append(trader.get_buy_price())
 
     def get_materials(self) -> list[Material]:
         raise NotImplementedError()
@@ -68,7 +77,17 @@ class Game:
         Generated materials must all have different names and different mining_rates.
         (You may have to call Material.random_material more than <amount> times.)
         """
-        raise NotImplementedError()
+        self.materials_generated = []
+        material_names = []
+        material_mining_times = []
+        number = 0
+        while number < amount:
+            material_to_add = Material.random_material()
+            if material_to_add.get_name() not in material_names and material_to_add.get_mining_rate() not in material_mining_times:
+                self.materials_generated.append(material_to_add)
+                material_names.append(material_to_add.get_name())
+                material_mining_times.append(material_to_add.get_mining_rate())
+                number += 1
 
     def generate_random_caves(self, amount):
         """
@@ -76,7 +95,15 @@ class Game:
         Generated caves must all have different names
         (You may have to call Cave.random_cave more than <amount> times.)
         """
-        raise NotImplementedError()
+        self.caves_generated = []
+        cave_names = []
+        number = 0
+        while number < amount:
+            cave_to_add = Cave.random_cave(self.materials_generated)
+            if cave_to_add.get_name() not in cave_names:
+                self.caves_generated.append(cave_to_add)
+                cave_names.append(cave_to_add.get_name())
+                number += 1
 
     def generate_random_traders(self, amount):
         """
@@ -86,7 +113,12 @@ class Game:
         Generated traders must all have different names
         (You may have to call <TraderClass>.random_trader() more than <amount> times.)
         """
-        raise NotImplementedError()
+        self.traders_generated = []
+        trader_names = []
+        number = 0
+        while number < amount:
+            trader_to_add = Trader.random_trader()
+            
 
     def finish_day(self):
         """

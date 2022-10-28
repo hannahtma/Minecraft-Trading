@@ -143,6 +143,18 @@ class Trader(ABC):
     def generate_deal(self) -> None:
         pass
 
+    @abstractmethod
+    def get_name(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_buy_price(self) -> float:
+        pass
+
+    @abstractmethod
+    def get_material_selected(self) -> Material:
+        pass
+
     def stop_deal(self) -> None:
         """
         Ends the trader's current deal
@@ -164,7 +176,11 @@ class RandomTrader(Trader):
         Parameters:
             name - Name of the trader
         """
-        self.trader_name = name
+        if name == None:
+            self.trader_name = RandomGen.random_choice(TRADER_NAMES)
+        else:
+            self.trader_name = name
+
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
@@ -209,6 +225,15 @@ class RandomTrader(Trader):
         else:
             return False
 
+    def get_name(self) -> str:
+        return self.trader_name
+
+    def get_buy_price(self) -> float:
+        return self.buy_price
+
+    def get_material_selected(self) -> Material:
+        return self.material_selected
+
     def __str__(self) -> str:
         """
         Returns a string representation of the Random Trader
@@ -226,7 +251,10 @@ class RangeTrader(Trader):
         Parameters:
             name - Name of the trader
         """
-        self.trader_name = name
+        if name == None:
+            self.trader_name = RandomGen.random_choice(TRADER_NAMES)
+        else:
+            self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
@@ -297,6 +325,15 @@ class RangeTrader(Trader):
         else:
             return False
 
+    def get_name(self) -> str:
+        return self.trader_name
+
+    def get_buy_price(self) -> float:
+        return self.buy_price
+
+    def get_material_selected(self) -> Material:
+        return self.material_selected
+
     def __str__(self) -> str:
         """
         Returns a string representation of the Random Trader
@@ -314,7 +351,10 @@ class HardTrader(Trader):
         Parameters:
             name - Name of the trader
         """
-        self.trader_name = name
+        if name == None:
+            self.trader_name = RandomGen.random_choice(TRADER_NAMES)
+        else:
+            self.trader_name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
@@ -360,6 +400,15 @@ class HardTrader(Trader):
             return True
         else:
             return False
+
+    def get_name(self) -> str:
+        return self.trader_name
+
+    def get_buy_price(self) -> float:
+        return self.buy_price
+
+    def get_material_selected(self) -> Material:
+        return self.material_selected
 
     def __str__(self) -> str:
         """

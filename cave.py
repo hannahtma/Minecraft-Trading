@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from material import Material
+from random_gen import RandomGen
 
 # List of cave names from https://en.uesp.net/wiki/Skyrim:Caves. Thanks Skyrim.
 CAVE_NAMES = [
@@ -99,23 +100,70 @@ CAVE_NAMES = [
 class Cave:
     
     def __init__(self, name: str, material: Material, quantity: float=0) -> None:
-        raise NotImplementedError()
+        """
+        Initializing Cave class instance variables
+
+        Complexity: O(1) for assigning values
+        """
+        self.name = name
+        self.material = material
+        self.quantity = quantity
     
     def add_quantity(self, amount: float) -> None:
-        raise NotImplementedError()
+        """
+        Add cave quantity
+
+        Complexity: O(1) for incrementing
+        """
+        self.quantity += amount
     
     def remove_quantity(self, amount: float) -> None:
-        raise NotImplementedError()
+        """
+        Remove cave quantity
+
+        Complexity: O(1) for decrementing
+        """
+        self.quantity -= amount
+
+    def get_name(self):
+        """
+        Getter for name. Returns self.name
+
+        Complexity: O(1)
+        """
+        return self.name 
+        
+    def get_material(self):
+        """
+        Getter for material. Returns self.material
+        
+        Complexity: O(1)
+        """
+        return self.material
 
     def get_quantity(self) -> float:
-        raise NotImplementedError()
+        """
+        Getter for quantity. Returns self.quantity
+        
+        Complexity: O(1)
+        """
+        return self.quantity
 
     def __str__(self) -> str:
-        raise NotImplementedError()
+        """
+        String method. Returns string with format
+        
+        Complexity: O(1)
+        """
+        return f"{self.name} {self.quantity} {self.material}"
 
     @classmethod
     def random_cave(self, material_list: list[Material]) -> Cave:
-        raise NotImplementedError()
+        random_name = RandomGen.random_choice(CAVE_NAMES)
+        random_material = RandomGen.random_choice(material_list)
+
+        return Cave(random_name, random_material)
+
 
 if __name__ == "__main__":
     print(Cave("Mt Coronet", Material("Coal", 4.5), 3))

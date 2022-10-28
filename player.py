@@ -98,7 +98,7 @@ class Player():
     def __init__(self, name, emeralds=None) -> None:
         self.name = name
         self.balance = self.DEFAULT_EMERALDS if emeralds is None else emeralds
-        raise NotImplementedError()
+        
 
     def set_traders(self, traders_list: list[Trader]) -> None:
         raise NotImplementedError()

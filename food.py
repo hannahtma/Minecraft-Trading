@@ -93,14 +93,57 @@ FOOD_NAMES = [
 class Food:
     
     def __init__(self, name: str, hunger_bars: int, price: int) -> None:
-        raise NotImplementedError()
-    
+        """
+        Initializing Food class instance variables
+
+        Complexity: O(1) for assigning values
+        """
+        self.name = name
+        self.hunger_bars = hunger_bars
+        self.price = price
+
+    def get_name(self):
+        """
+        Getter for name. Returns self.name
+
+        Complexity: O(1)
+        """
+        return self.name
+
+    def get_hunger_bars(self):
+        """
+        Getter for hunger bars. Returns self.hunger_bars
+
+        Complexity: O(1)
+        """
+        return self.hunger_bars
+
+    def get_food_price(self):
+        """
+        Getter for food price. Returns self.price
+
+        Complexity: O(1)
+        """
+        return self.price
+
     def __str__(self) -> str:
-        raise NotImplementedError()
+        """
+        String method. Returns string with format
+        
+        Complexity: O(1)
+        """
+        return f"{self.name} {self.hunger_bars} {self.price}"
 
     @classmethod
     def random_food(cls) -> Food:
-        raise NotImplementedError()
+        """
+        Random generate for food. Returns food.
+        
+        complexity: O(1)
+        """
+        food = RandomGen.random_choice(FOOD_NAMES)
+        return food
 
 if __name__ == "__main__":
     print(Food.random_food())
+
