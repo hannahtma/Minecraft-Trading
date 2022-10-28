@@ -155,15 +155,14 @@ class SoloGame(Game):
             food_purchasable = True
 
     def set_materials(self, mats: list[Material]) -> None:
-        print("materials AAAAAAA")
         for material in mats:
             self.materials.__setitem__(material.get_mining_rate(), material)
 
     def set_caves(self, caves: list[Cave]) -> None:
-        print("caves AAAAAAA")
-        self.caves = LinearProbeTable(len(caves)-1)
+        self.caves = LinearProbeTable(len(caves), tablesize_override = 11)
+        print("THIS IS LEN(CAVES)", len(caves)-1)
         for cave in caves:
-            print("THIS IS OUR CAVE: ",cave)
+            # print("THIS IS OUR CAVE: ",cave)
             # self.caves.__setitem__(cave.get_quantity(), cave)
             print(cave.get_material().get_name())
             self.caves.__setitem__(cave.get_material().get_name(), cave)
@@ -171,7 +170,6 @@ class SoloGame(Game):
         print("this is self.caves: ",str(self.caves))
 
     def set_traders(self, traders: list[Trader]) -> None:
-        print("traders AAAAA")
         for trader in traders:
             trader_object = TreeNode(trader.get_buy_price(), trader)
             self.traders.__setitem__(trader_object.key, trader_object.item)
