@@ -1,4 +1,5 @@
 from __future__ import annotations
+from random import Random
 
 from material import Material
 from random_gen import RandomGen
@@ -103,6 +104,8 @@ class Cave:
         self.name = name
         self.material = material
         self.quantity = quantity
+        if self.quantity == 0:
+            self.quantity = round(RandomGen.random_float(), 2)
     
     def get_name(self):
         return self.name
