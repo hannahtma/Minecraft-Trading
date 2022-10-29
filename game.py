@@ -186,7 +186,7 @@ class SoloGame(Game):
             food_purchasable = True
         
         if food_purchasable == True:
-            
+            return "yes"
         
 
 class MultiplayerGame(Game):
@@ -211,7 +211,17 @@ class MultiplayerGame(Game):
 
     def generate_random_players(self, amount) -> None:
         """Generate <amount> random players. Don't need anything unique, but you can do so if you'd like."""
-        raise NotImplementedError()
+        self.players_generated = []
+        player_names = []
+        players_balance = []
+        number = 0
+        while number < amount:
+            player_to_add = Player.random_player()
+            if player_to_add.get_name() not in player_names and player_to_add.get_balance() not in players_balance:
+                self.materials_generated.append(player_to_add)
+                player_names.append(player_to_add.get_name())
+                players_balance.append(player_to_add.get_balance())
+                number += 1
 
     def initialise_with_data(self, materials: list[Material], caves: list[Cave], traders: list[Trader], player_names: list[int], emerald_info: list[float]):
         super().initialise_with_data(materials, caves, traders)
@@ -225,7 +235,9 @@ class MultiplayerGame(Game):
 
     def simulate_day(self):
         # 1. Traders make deals
-        raise NotImplementedError()
+        for trader_key in self.traders_key_list:
+            trader = self.traders.__getitem__(trader_key)
+            trader.generate_deal()
         print("Traders Deals:\n\t", end="")
         print("\n\t".join(map(str, self.get_traders())))
         # 2. Food is offered
@@ -245,8 +257,7 @@ class MultiplayerGame(Game):
                 food_list.append(food)
             else:
                 food_list.append(None)
-        
-            playe
+            player.select_food_and_caves()
 
     def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
         raise NotImplementedError()
