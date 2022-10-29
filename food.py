@@ -1,4 +1,5 @@
 from __future__ import annotations
+from random import Random
 
 from material import Material
 from random_gen import RandomGen
@@ -109,8 +110,8 @@ class Food:
 
     @classmethod
     def random_food(cls) -> Food:
-        hunger_bars = 0
-        price = 0
+        hunger_bars = RandomGen.randint(1, 500)
+        price = round(RandomGen.random_float(), 2)
         return Food(RandomGen.random_choice(FOOD_NAMES), hunger_bars, price)
 
 if __name__ == "__main__":
