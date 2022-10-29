@@ -1,4 +1,5 @@
 from __future__ import annotations
+from random import Random
 
 from material import Material
 from random_gen import RandomGen
@@ -93,57 +94,28 @@ FOOD_NAMES = [
 class Food:
     
     def __init__(self, name: str, hunger_bars: int, price: int) -> None:
-        """
-        Initializing Food class instance variables
-
-        Complexity: O(1) for assigning values
-        """
         self.name = name
         self.hunger_bars = hunger_bars
         self.price = price
-
-    def get_name(self):
-        """
-        Getter for name. Returns self.name
-
-        Complexity: O(1)
-        """
-        return self.name
-
+    
     def get_hunger_bars(self):
-        """
-        Getter for hunger bars. Returns self.hunger_bars
-
-        Complexity: O(1)
-        """
         return self.hunger_bars
-
-    def get_food_price(self):
-        """
-        Getter for food price. Returns self.price
-
-        Complexity: O(1)
-        """
+    
+    def get_price(self):
         return self.price
-
+    
     def __str__(self) -> str:
-        """
-        String method. Returns string with format
-        
-        Complexity: O(1)
-        """
-        return f"{self.name} {self.hunger_bars} {self.price}"
+        food_string = f"{self.name}"
+        return food_string
 
     @classmethod
     def random_food(cls) -> Food:
-        """
-        Random generate for food. Returns food.
-        
-        complexity: O(1)
-        """
-        food = RandomGen.random_choice(FOOD_NAMES)
-        return food
+        hunger_bars = RandomGen.randint(1, 500)
+        price = round(RandomGen.random_float(), 2)
+        return Food(RandomGen.random_choice(FOOD_NAMES), hunger_bars, price)
 
 if __name__ == "__main__":
+    print(Food.random_food())
+
     print(Food.random_food())
 
