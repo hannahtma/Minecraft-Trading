@@ -180,10 +180,10 @@ class LinearProbeTable(Generic[T]):
             :see: #self.__contains__(key: str)
         """
 
-        position = self._linear_probe(key, True)
-
         if self.__len__() > self.tablesize // 2:
             self._rehash()
+        position = self._linear_probe(key, True)
+
         if self.table[position] is None:
             self.count += 1
 
