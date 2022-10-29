@@ -48,8 +48,6 @@ class LinearProbeTable(Generic[T]):
             self.tablesize = next(self.iterator)
         else:
             self.iterator = LargestPrimeIterator(self.expected_size, 2)
-        # self.tablesize = next(self.iterator)
-        print("what is it?",self.tablesize)
 
         self.table = ArrayR(max(self.MIN_CAPACITY, self.tablesize))
         
@@ -105,38 +103,32 @@ class LinearProbeTable(Generic[T]):
             :raises KeyError: When a position can't be found
         """
         position = self.hash(key)  # get the position using hash
-        print("HASHED POSITION", key, position)
-        # print("tablesize", self.tablesize)
 
         if is_insert and self.is_full():
             raise KeyError(key)
 
-        probe_length = 0
+        probe_length = 0 # set probe length to 0
         for _ in range(len(self.table)):  # start traversing
             if self.table[position] is None:  # found empty slot
-                # print("this is the position",position)
                 if is_insert:
-                    self.is_linear_probe = True
+                    self.is_linear_probe = True # add a variable to see if this value will raise conflicts
                     return position
                 else:
                     raise KeyError(key)  # so the key is not in
             elif self.table[position][0] == key:  # found key
                 return position
             else:  # there is something but not the key, try next
-                # print(key, "what")
                 position = (position + 1) % len(self.table)
-                # print("this is position",key, position)
                 probe_length += 1
                 self.probe_total += 1
             
             if self.is_linear_probe == True:
+                # if the item inserted is linear probed, conflict count += 1
                 self.conflict_count += 1
-            self.is_linear_probe = False
+            self.is_linear_probe = False # reset is_linear_probe to 0
+            # if probe_length is greater than the current probe_max, then update probe_max
             if probe_length > self.probe_max:
                 self.probe_max = probe_length
-        
-        for x in self.table:
-            print("x",x)
 
         raise KeyError(key)
 
@@ -189,7 +181,6 @@ class LinearProbeTable(Generic[T]):
         """
 
         position = self._linear_probe(key, True)
-        # print("POSITION IS HERE:" ,position, key)
 
         if self.__len__() > self.tablesize // 2:
             self._rehash()
@@ -197,7 +188,6 @@ class LinearProbeTable(Generic[T]):
             self.count += 1
 
         self.table[position] = (key, data)
-        # print(self.table[position])
 
     def is_empty(self):
         """
@@ -228,10 +218,9 @@ class LinearProbeTable(Generic[T]):
             :complexity: O(N) where N is length of self.table
         """
 
-        self.rehash_count += 1
-        print("REHASH COUNT?" ,self.rehash_count)
-        self.tablesize = next(self.iterator)
-        print("DOES THE SELF PRIME INCREASE?",self.tablesize)
+        self.rehash_count += 1 # each time enter rehash, rehash_count += 1
+        self.tablesize = next(self.iterator) # tablesize gets updated each time enter rehash
+
         new_hash = LinearProbeTable(self.expected_size, self.tablesize)
 
         for item in range(len(self.table)):
