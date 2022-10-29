@@ -115,16 +115,16 @@ class Player():
     def set_foods(self, foods_list: list[Food]) -> None:
         for food in foods_list:
             food_item = TreeNode(food.get_hunger_bars(), food)
-            self.foods.__setitem__(food_item.key, food_item.item)
+            if self.foods.__contains__(food_item.key) != True:
+                self.foods.__setitem__(food_item.key, food_item.item)
         # self.current = TreeNode(foods_list[len(foods_list)-1].get_hunger_bars(), foods_list[len(foods_list)-1])
 
     @classmethod
     def random_player(self) -> Player:
-        name_index = RandomGen(0, 80)
-        self.name = PLAYER_NAMES[name_index]
+        name = RandomGen.random_choice(PLAYER_NAMES)
         balance = None
 
-        return Player(self.name, balance)
+        return Player(name, balance)
 
     def set_materials(self, materials_list: list[Material]) -> None:
         self.materials_list = materials_list
@@ -143,7 +143,6 @@ class Player():
         #     if self.foods_list[food].get_hunger_bars() > max_hunger_bars:
         #         max_hunger_bars = self.foods_list[food].get_hunger_bars()
         #         food_choice = self.foods_list[food]
-
         self.hunger_bars = food_choice.item.get_hunger_bars()
         self.balance -= food_choice.item.get_price()
         print("hunger bars", self.hunger_bars)
@@ -165,17 +164,32 @@ class Player():
             print("this is self.caves_list: ")
             print(self.caves_list)
 
-            if self.caves_list.__contains__(item_to_buy.get_name()):
-                the_cave = self.caves_list.__getitem__(item_to_buy.get_name())
-                self.caves.append(the_cave)
-                self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
-                print("after purchase: ", self.hunger_bars)
-                self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
+            for cave in self.caves_list.values():
+                if cave.get_material() == item_to_buy:
+                    the_cave = self.caves_list.__getitem__(cave.get_name())
+                    self.caves.append(the_cave)
+                    self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
+                    print("after purchase: ", self.hunger_bars)
+                    self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
+
+            # cave = self.caves_list.__getitem__()
+
+            # for cave in self.caves_list:
+            #     if cave.get_material().get_name() == item_to_buy:
+            #         the_cave = self.caves_list.__getitem__(item_to_buy.get_material().get_name())
+            #         self.caves.append(the_cave)
+            #         self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
+            #         print("after purchase: ", self.hunger_bars)
+            #         self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
+
+            # if self.caves_list.__contains__(item_to_buy.get_material().get_name()):
+            #     the_cave = self.caves_list.__getitem__(item_to_buy.get_material().get_name())
+            #     self.caves.append(the_cave)
+            #     self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
+            #     print("after purchase: ", self.hunger_bars)
+            #     self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
         
         return (food_choice, self.balance, self.caves)
 
     def __str__(self) -> str:
         return f"{self.caves}"
-
-if __name__ == "__main__":
-    print(len(PLAYER_NAMES))
