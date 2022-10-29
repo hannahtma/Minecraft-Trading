@@ -105,8 +105,7 @@ class Food:
         return self.price
     
     def __str__(self) -> str:
-        food_string = f"{self.name}"
-        return food_string
+        return f"{self.name} {self.price}💰 for {self.hunger_bars}🍗"
 
     @classmethod
     def random_food(cls) -> Food:
