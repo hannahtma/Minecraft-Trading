@@ -11,6 +11,7 @@ from cave import Cave
 from food import Food
 from random_gen import RandomGen
 from avl import AVLTree
+from trader import RandomTrader, RangeTrader, HardTrader
 
 class Game:
 
@@ -59,23 +60,23 @@ class Game:
     def set_caves(self, caves: list[Cave]) -> None:
         self.caves = LinearProbeTable(len(caves))
         # print("we are here",caves)
-        print("THIS IS LEN(CAVES)", len(caves))
+        # print("THIS IS LEN(CAVES)", len(caves))
         for cave in caves:
-            print("THIS IS OUR CAVE: ",cave)
+            # print("THIS IS OUR CAVE: ",cave)
             # self.caves.__setitem__(cave.get_quantity(), cave)
             # print(cave.get_name())
             self.caves.__setitem__(cave.get_name(), cave)
         
-        print("this is self.caves: ",str(self.caves))
+        # print("this is self.caves: ",str(self.caves))
 
     def set_traders(self, traders: list[Trader]) -> None:
         self.traders_key_list = []
         for trader in traders:
             trader.generate_deal()
-            print(trader)
+            # print(trader)
             self.traders.__setitem__(trader.get_buy_price(), trader)
             self.traders_key_list.append(trader.get_buy_price())
-        print(self.traders_key_list)
+        # print(self.traders_key_list)
         
     def get_materials(self) -> list[Material]:
         return self.materials
@@ -84,7 +85,7 @@ class Game:
         return self.caves.values()
 
     def get_traders(self) -> list[Trader]:
-        return self.traders_key_list
+        return self.traders
 
     def generate_random_materials(self, amount):
         """
@@ -128,7 +129,6 @@ class Game:
         for _ in range(amount):
             trader = Trader.random_trader()
             random_traders.append(trader)
-        # print(random_traders)
             trader.set_all_materials(self.materials_generated)
         self.set_traders(random_traders)
 
@@ -141,7 +141,7 @@ class Game:
             if cave.quantity > 0 and RandomGen.random_chance(0.2):
                 cave.remove_quantity(RandomGen.random_float() * cave.quantity)
             else:
-                cave.add_quantity(RandomGen.random_float() * 10, 2)
+                cave.add_quantity(round(RandomGen.random_float() * 10, 2))
             cave.quantity = round(cave.quantity, 2)
 
 class SoloGame(Game):
@@ -185,9 +185,13 @@ class SoloGame(Game):
         if food == self.player.get_foods().get_maximal(self.player.get_foods().root):
             food_purchasable = True
         
-        if food_purchasable == True:
-            return "yes"
-        
+        materials = self.player.get_materials_sold()
+
+        for cave in range(len(caves)):
+            the_cave = caves[cave]
+            print("we are here",the_cave)
+            # the_cave.get_quantity() = the_cave.get_quantity() - materials.index(caves[cave][0])[1]
+        print(caves)
 
 class MultiplayerGame(Game):
 
@@ -263,24 +267,86 @@ class MultiplayerGame(Game):
         raise NotImplementedError()
 
 if __name__ == "__main__":
-    # RandomGen.set_seed(1239087123)
-    # g = SoloGame()
-    # g.initialise_game()
-    # # I'm going to assume you have a `name` attribute on the Materials.
-    # print(len(set(map(lambda m: m.name, g.get_materials()))))
-    # print(len(g.get_materials()))
-    # # Same deal with caves
-    # print(len(set(map(lambda c: c.name, g.get_caves()))))
-    # print(len(g.get_caves()))
-    # # and Traders
-    # print(len(set(map(lambda t: t.name, g.get_traders()))))
-    # print(len(g.get_traders()))
-
-    RandomGen.set_seed(1234)
+    RandomGen.set_seed(1239087123)
     g = SoloGame()
     g.initialise_game()
-    # Spend some time in minecraft
-    # Note that this will crash if you generate a HardTrader with less than 3 materials.
-    for _ in range(3):
-        g.simulate_day()
-        g.finish_day()
+    # I'm going to assume you have a `name` attribute on the Materials.
+    print(len(set(map(lambda m: m.name, g.get_materials()))))
+    print(len(g.get_materials()))
+    # Same deal with caves
+    print(len(set(map(lambda c: c.name, g.get_caves()))))
+    print(len(g.get_caves()))
+    # and Traders
+    print(len(set(map(lambda t: t.name, g.get_traders()))))
+    print(len(g.get_traders()))
+
+    # RandomGen.set_seed(1234)
+    # g = SoloGame()
+    # g.initialise_game()
+    # # Spend some time in minecraft
+    # # Note that this will crash if you generate a HardTrader with less than 3 materials.
+    # for _ in range(3):
+    #     g.simulate_day()
+    #     g.finish_day()
+
+    # RandomGen.set_seed(16)
+        
+    # gold = Material("Gold Nugget", 27.24)
+    # netherite = Material("Netherite Ingot", 20.95)
+    # fishing_rod = Material("Fishing Rod", 26.93)
+    # ender_pearl = Material("Ender Pearl", 13.91)
+    # prismarine = Material("Prismarine Crystal", 11.48)
+
+    # materials = [
+    #     gold,
+    #     netherite,
+    #     fishing_rod,
+    #     ender_pearl,
+    #     prismarine,
+    # ]
+
+    # caves = [
+    #     Cave("Boulderfall Cave", prismarine, 10),
+    #     Cave("Castle Karstaag Ruins", netherite, 4),
+    #     Cave("Glacial Cave", gold, 3),
+    #     Cave("Orotheim", fishing_rod, 6),
+    #     Cave("Red Eagle Redoubt", fishing_rod, 3),
+    # ]
+
+    # waldo = RandomTrader("Waldo Morgan")
+    # waldo.add_material(fishing_rod)     # Now selling for 7.57
+    # orson = RandomTrader("Orson Hoover")
+    # orson.add_material(gold)            # Now selling for 4.87
+    # lea = RandomTrader("Lea Carpenter")
+    # lea.add_material(prismarine)        # Now selling for 5.65
+    # ruby = RandomTrader("Ruby Goodman")
+    # ruby.add_material(netherite)        # Now selling for 8.54
+    # mable = RandomTrader("Mable Hodge")
+    # mable.add_material(gold)            # Now selling for 6.7
+    
+    # traders = [
+    #     waldo,
+    #     orson,
+    #     lea,
+    #     ruby,
+    #     mable,
+    # ]
+    
+    # for trader in traders:
+    #     trader.generate_deal()
+
+    # g = SoloGame()
+    # g.initialise_with_data(materials, caves, traders, ["Jackson"], [50])
+
+    # # Avoid simulate_day - This regenerates trader deals and foods.
+    # foods = [
+    #     Food("Cabbage Seeds", 106, 30),
+    #     Food("Fried Rice", 129, 24),
+    #     Food("Cooked Chicken Cuts", 424, 19),
+    # ]
+
+    # g.player.set_foods(foods)
+    # food, balance, caves = g.player.select_food_and_caves()
+    
+    # self.assertGreaterEqual(balance, 185.01974749350165 - pow(10, -4))
+    # # Actual tests will also check your output is possible.
