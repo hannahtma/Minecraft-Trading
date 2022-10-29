@@ -42,12 +42,14 @@ class LinearProbeTable(Generic[T]):
         self.expected_size = expected_size
         self.tablesize = tablesize_override
 
-        self.iterator = LargestPrimeIterator(self.expected_size, self.tablesize)
-        self.next_prime = next(self.iterator)
-        print("what is it?",self.next_prime)
-
         if self.tablesize == -1:
             self.tablesize = self.expected_size
+            self.iterator = LargestPrimeIterator(self.expected_size, self.tablesize)
+            self.tablesize = next(self.iterator)
+        else:
+            self.iterator = LargestPrimeIterator(self.expected_size, self.tablesize)
+        # self.tablesize = next(self.iterator)
+        # print("what is it?",self.tablesize)
 
         self.table = ArrayR(max(self.MIN_CAPACITY, self.tablesize))
         
@@ -103,7 +105,7 @@ class LinearProbeTable(Generic[T]):
             :raises KeyError: When a position can't be found
         """
         position = self.hash(key)  # get the position using hash
-        print("HASHED POSITION", key, position)
+        # print("HASHED POSITION", key, position)
         # print("tablesize", self.tablesize)
 
         if is_insert and self.is_full():
@@ -132,9 +134,6 @@ class LinearProbeTable(Generic[T]):
             self.is_linear_probe = False
             if probe_length > self.probe_max:
                 self.probe_max = probe_length
-        
-        for x in self.table:
-            print("x",x)
 
         raise KeyError(key)
 
@@ -227,10 +226,10 @@ class LinearProbeTable(Generic[T]):
         """
 
         self.rehash_count += 1
-        print("REHASH COUNT?" ,self.rehash_count)
-        self.next_prime = next(self.iterator)
-        print("DOES THE SELF PRIME INCREASE?",self.next_prime)
-        new_hash = LinearProbeTable(self.expected_size, self.next_prime)
+        # print("REHASH COUNT?" ,self.rehash_count)
+        self.tablesize = next(self.iterator)
+        # print("DOES THE SELF PRIME INCREASE?",self.tablesize)
+        new_hash = LinearProbeTable(self.expected_size, self.tablesize)
 
         for item in range(len(self.table)):
             if self.table.__getitem__(item) != None:
