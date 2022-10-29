@@ -4,7 +4,7 @@ from xml.etree.ElementPath import xpath_tokenizer_re
 from hash_table import LinearProbeTable
 from node import TreeNode
 
-from player import Player
+from player import Player, PLAYER_NAMES
 from trader import Trader
 from material import Material
 from cave import Cave
@@ -12,6 +12,7 @@ from food import Food
 from random_gen import RandomGen
 from avl import AVLTree
 from trader import RandomTrader, RangeTrader, HardTrader
+import unittest
 
 class Game:
 
@@ -62,12 +63,12 @@ class Game:
         # print("we are here",caves)
         # print("THIS IS LEN(CAVES)", len(caves))
         for cave in caves:
-            # print("THIS IS OUR CAVE: ",cave)
+            print("THIS IS OUR CAVE: ",cave)
             # self.caves.__setitem__(cave.get_quantity(), cave)
             # print(cave.get_name())
             self.caves.__setitem__(cave.get_name(), cave)
         
-        # print("this is self.caves: ",str(self.caves))
+        print("this is self.caves: ",str(self.caves))
 
     def set_traders(self, traders: list[Trader]) -> None:
         self.traders_key_list = []
@@ -186,12 +187,15 @@ class SoloGame(Game):
             food_purchasable = True
         
         materials = self.player.get_materials_sold()
-
+        print(caves)
         for cave in range(len(caves)):
             the_cave = caves[cave]
+            quantity_to_check = materials.index(caves[cave])[1]
             print("we are here",the_cave)
-            # the_cave.get_quantity() = the_cave.get_quantity() - materials.index(caves[cave][0])[1]
-        print(caves)
+            self.assertEqual(caves[cave].get_quantity(), quantity_to_check)
+            the_cave.remove_quantity(quantity_to_check)
+
+        print("updated caves:", caves)
 
 class MultiplayerGame(Game):
 
@@ -256,29 +260,34 @@ class MultiplayerGame(Game):
         """
         """
         food_list = []
+        foods = [food]
         for player in self.players:
+            player.set_foods(foods)
             if player.get_balance() >= food.get_price():
                 food_list.append(food)
             else:
                 food_list.append(None)
-            player.select_food_and_caves()
+            the_players = player.select_food_and_caves()
+
+        return tuple(the_players)
+        
 
     def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
         raise NotImplementedError()
 
 if __name__ == "__main__":
-    RandomGen.set_seed(1239087123)
-    g = SoloGame()
-    g.initialise_game()
-    # I'm going to assume you have a `name` attribute on the Materials.
-    print(len(set(map(lambda m: m.name, g.get_materials()))))
-    print(len(g.get_materials()))
-    # Same deal with caves
-    print(len(set(map(lambda c: c.name, g.get_caves()))))
-    print(len(g.get_caves()))
-    # and Traders
-    print(len(set(map(lambda t: t.name, g.get_traders()))))
-    print(len(g.get_traders()))
+    # RandomGen.set_seed(1239087123)
+    # g = SoloGame()
+    # g.initialise_game()
+    # # I'm going to assume you have a `name` attribute on the Materials.
+    # print(len(set(map(lambda m: m.name, g.get_materials()))))
+    # print(len(g.get_materials()))
+    # # Same deal with caves
+    # print(len(set(map(lambda c: c.name, g.get_caves()))))
+    # print(len(g.get_caves()))
+    # # and Traders
+    # print(len(set(map(lambda t: t.name, g.get_traders()))))
+    # print(len(g.get_traders()))
 
     # RandomGen.set_seed(1234)
     # g = SoloGame()
@@ -290,7 +299,6 @@ if __name__ == "__main__":
     #     g.finish_day()
 
     # RandomGen.set_seed(16)
-        
     # gold = Material("Gold Nugget", 27.24)
     # netherite = Material("Netherite Ingot", 20.95)
     # fishing_rod = Material("Fishing Rod", 26.93)
@@ -348,5 +356,50 @@ if __name__ == "__main__":
     # g.player.set_foods(foods)
     # food, balance, caves = g.player.select_food_and_caves()
     
-    # self.assertGreaterEqual(balance, 185.01974749350165 - pow(10, -4))
+    # print(balance) # 185.01974749350165 - pow(10, -4))
     # # Actual tests will also check your output is possible.
+
+    RandomGen.set_seed(1234)
+    materials = [
+        Material.random_material()
+        for _ in range(400)
+    ]
+    mat_set = set()
+    mining_set = set()
+    materials = list(filter(lambda x: (x.name not in mat_set and x.mining_rate not in mining_set) and (mat_set.add(x.name) or mining_set.add(x.mining_rate)) is None, materials))
+    caves = [
+        Cave.random_cave(materials)
+        for _ in range(400)
+    ]
+    cave_set = set()
+    caves = list(filter(lambda x: x.name not in cave_set and cave_set.add(x.name) is None, caves))        
+    traders = [
+        RandomGen.random_choice([RangeTrader, RandomTrader]).random_trader()
+        for _ in range(50)
+    ]
+    trade_set = set()
+    traders = list(filter(lambda x: x.name not in trade_set and trade_set.add(x.name) is None, traders))
+    for trader in traders:
+        trader.set_all_materials(materials)
+    players = [
+        RandomGen.random_choice(PLAYER_NAMES)
+        for _ in range(20)
+    ]
+    balances = [
+        RandomGen.randint(20, 100)
+        for _ in range(20)
+    ]
+    RandomGen.set_seed(12345)
+    g = MultiplayerGame()
+    g.initialise_with_data(
+        materials,
+        caves,
+        traders,
+        players,
+        balances,
+    )
+    
+    # Live a year in minecraft
+    for _ in range(365):
+        g.simulate_day()
+        g.finish_day()
