@@ -106,6 +106,12 @@ class Player():
     def get_balance(self):
         return self.balance
 
+    def get_materials_sold(self):
+        return self.materials_sold
+    
+    def get_foods(self):
+        return self.foods
+
     def set_traders(self, traders_list: list[Trader]) -> None:
         self.traders_list = traders_list
         # print("This is trader list:")
@@ -135,19 +141,14 @@ class Player():
     def select_food_and_caves(self) -> tuple[Food | None, float, list[tuple[Cave, float]]]:
         self.caves = []
         food_choice = self.foods.get_maximal(self.foods.root)
-        # print("self.root", self.foods.root)
-        # print("right",self.foods.root.right)
-        # print("left",self.foods.root.left)
         print("food choice", food_choice)
-        # for food in range(len(self.foods_list)):
-        #     if self.foods_list[food].get_hunger_bars() > max_hunger_bars:
-        #         max_hunger_bars = self.foods_list[food].get_hunger_bars()
-        #         food_choice = self.foods_list[food]
+
         self.hunger_bars = food_choice.item.get_hunger_bars()
         self.balance -= food_choice.item.get_price()
         print("hunger bars", self.hunger_bars)
         print("balance: ", self.balance)
 
+        self.materials_sold = []
         while self.hunger_bars > 0 and self.traders_list.is_empty() == False:
             print("current self.hunger_bars:", self.hunger_bars)
             print("current self.balance:", self.balance)
@@ -161,35 +162,23 @@ class Player():
             item_to_buy = best_price.item.get_selected_material()
             print("item to buy: ", item_to_buy)
 
-            print("this is self.caves_list: ")
-            print(self.caves_list)
+            # print("this is self.caves_list: ")
+            # print("here",type(self.caves_list))
 
-            for cave in self.caves_list.values():
+            for cave in self.caves_list:
+                print(cave)
+
+            for cave in self.caves_list:
                 if cave.get_material() == item_to_buy:
-                    the_cave = self.caves_list.__getitem__(cave.get_name())
+                    the_cave = self.caves_list.index(cave)
                     self.caves.append(the_cave)
-                    self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
+                    self.hunger_bars -= item_to_buy.get_mining_rate() * cave.get_quantity()
                     print("after purchase: ", self.hunger_bars)
-                    self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
-
-            # cave = self.caves_list.__getitem__()
-
-            # for cave in self.caves_list:
-            #     if cave.get_material().get_name() == item_to_buy:
-            #         the_cave = self.caves_list.__getitem__(item_to_buy.get_material().get_name())
-            #         self.caves.append(the_cave)
-            #         self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
-            #         print("after purchase: ", self.hunger_bars)
-            #         self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
-
-            # if self.caves_list.__contains__(item_to_buy.get_material().get_name()):
-            #     the_cave = self.caves_list.__getitem__(item_to_buy.get_material().get_name())
-            #     self.caves.append(the_cave)
-            #     self.hunger_bars -= item_to_buy.get_mining_rate() * the_cave.get_quantity()
-            #     print("after purchase: ", self.hunger_bars)
-            #     self.balance += best_price.item.get_buy_price() * the_cave.get_quantity()
+                    self.balance += best_price.item.get_buy_price() * cave.get_quantity()
+                    self.materials_sold.append((cave,cave.get_quantity()))
+        print("this is materials sold",self.materials_sold)
         
         return (food_choice, self.balance, self.caves)
 
     def __str__(self) -> str:
-        return f"{self.caves}"
+        return f"{self.name} {self.balance}💰"
