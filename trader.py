@@ -78,17 +78,15 @@ class Trader(ABC):
             self.name = RandomGen.random_choice(TRADER_NAMES)
         else:
             self.name = name
+        self.materials = AVLTree()
 
     @classmethod
     def random_trader(cls):
         return RandomGen.random_choice([RandomTrader(),RangeTrader(),HardTrader()])
     
+    @abstractmethod
     def set_all_materials(self, mats: list[Material]) -> None:
-        self.materials = AVLTree()
-        self.key_list = []
-        for material in mats:
-            self.materials.__setitem__(material.get_mining_rate(),material)
-            self.key_list.append(material.get_mining_rate())
+        pass
     
     def add_material(self, mat: Material) -> None:
         self.materials.__setitem__(mat.get_mining_rate(),mat)
@@ -128,8 +126,17 @@ class RandomTrader(Trader):
     
     def get_selected_material(self):
         return self.material_selected
+
+    def set_all_materials(self, mats: list[Material]) -> None:
+        self.key_list = []
+        for material in mats:
+            print(material)
+            self.materials.__setitem__(material.get_mining_rate(),material)
+            self.key_list.append(material.get_mining_rate())
+        print("here",self.key_list)
     
     def generate_deal(self) -> None:
+        print("there",self.key_list)
         self.material_selected = self.materials.__getitem__(RandomGen.random_choice(self.key_list))
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
         self.current_deal()
@@ -164,6 +171,13 @@ class RangeTrader(Trader):
     
     def get_selected_material(self):
         return self.material_selected
+
+    def set_all_materials(self, mats: list[Material]) -> None:
+        
+        self.key_list = []
+        for material in mats:
+            self.materials.__setitem__(material.get_mining_rate(),material)
+            self.key_list.append(material.get_mining_rate())
 
     def generate_deal(self) -> None:
         if self.materials.__len__() <= 1:
@@ -206,13 +220,24 @@ class HardTrader(Trader):
         self.key_list = []
         self.deal = None
 
+    def get_name(self):
+        return self.trader_name
+
     def get_buy_price(self):
         return self.buy_price
     
     def get_selected_material(self):
         return self.material_selected
+
+    def set_all_materials(self, mats: list[Material]) -> None:
+        
+        self.key_list = []
+        for material in mats:
+            self.materials.__setitem__(material.get_mining_rate(),material)
+            self.key_list.append(material.get_mining_rate())
     
     def generate_deal(self) -> None:
+        print(self.materials.is_empty())
         self.material_selected = (self.materials.get_maximal(self.materials.root)).item
         self.materials.__delitem__(self.material_selected.get_mining_rate())
         self.buy_price = round(2 + 8 * RandomGen.random_float(), 2)
