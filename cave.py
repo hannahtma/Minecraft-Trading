@@ -105,16 +105,13 @@ class Cave:
         self.material = material
         self.quantity = quantity
         if self.quantity == 0:
-            self.quantity = round(RandomGen.random_float(), 2)
+            self.quantity = round(RandomGen.randint(1, 10), 2)
     
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name
 
-    def get_material(self):
+    def get_material(self) -> Material:
         return self.material
-
-    def get_quantity(self):
-        return self.quantity
     
     def add_quantity(self, amount: float) -> None:
         self.quantity += amount
@@ -126,7 +123,7 @@ class Cave:
         return self.quantity
 
     def __str__(self) -> str:
-        cave_string = f"{self.name}. {self.quantity} of [{self.material}]"
+        cave_string = f"{self.name}. {self.quantity} of {self.material.get_name()}"
         return cave_string
 
         # Caves = [
