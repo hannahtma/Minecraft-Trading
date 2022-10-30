@@ -7,7 +7,6 @@ as well as simulating days and verifying that player choices are correct
 
 from __future__ import annotations
 from abc import abstractmethod
-from xml.etree.ElementPath import xpath_tokenizer_re
 from hash_table import LinearProbeTable
 from node import TreeNode
 
@@ -19,7 +18,6 @@ from food import Food
 from random_gen import RandomGen
 from avl import AVLTree
 from trader import RandomTrader, RangeTrader, HardTrader
-import unittest
 
 class Game:
 
@@ -36,6 +34,9 @@ class Game:
     MAX_FOOD = 5
 
     def __init__(self) -> None:
+        """
+            Initialises the gama
+        """
         self.materials = AVLTree()
         self.traders = AVLTree()
 
@@ -60,6 +61,14 @@ class Game:
         self.set_traders(traders)
     
     def set_materials(self, mats: list[Material]) -> None:
+        """
+            Sets self.materials to the material list passed through
+
+            Parameters:
+                - mats: the list of materials for the game
+
+            :complexity: O(1)
+        """
         # self.materials_key_list = []
         # for material in mats:
         #     self.materials.__setitem__(material.get_mining_rate(), material)
@@ -67,6 +76,14 @@ class Game:
         self.materials = mats
 
     def set_caves(self, caves: list[Cave]) -> None:
+        """
+            Sets self.caves to the cave list passed through
+
+            Parameters:
+                - caves: the list of caves for the game
+
+            :complexity: O(1)
+        """
         # self.caves = LinearProbeTable(len(caves))
         # # print("we are here",caves)
         # # print("THIS IS LEN(CAVES)", len(caves))
@@ -80,6 +97,14 @@ class Game:
         self.caves = caves
 
     def set_traders(self, traders: list[Trader]) -> None:
+        """
+            Sets self.traders to the trader list passed through
+
+            Parameters:
+                - traders: the list of traders for the game
+
+            :complexity: O(1)
+        """
         # self.traders_key_list = []
         # for trader in traders:
         #     trader.generate_deal()
@@ -159,6 +184,11 @@ class Game:
 class SoloGame(Game):
 
     def initialise_game(self) -> None:
+        """
+            Initialises the game for one player.
+            A player is randomly generated and all game objects are initialised
+            based on the game's random generation.
+        """
         super().initialise_game()
         self.player = Player.random_player()
         self.player.set_materials(self.get_materials())
@@ -166,6 +196,10 @@ class SoloGame(Game):
         self.player.set_traders(self.get_traders())
 
     def initialise_with_data(self, materials: list[Material], caves: list[Cave], traders: list[Trader], player_names: list[int], emerald_info: list[float]):
+        """
+            Initialises game using specific data.
+            Sets all game objects to the data passed through.
+        """
         super().initialise_with_data(materials, caves, traders)
         self.player = Player(player_names[0], emeralds=emerald_info[0])
         self.player.set_materials(self.get_materials())
@@ -173,11 +207,16 @@ class SoloGame(Game):
         self.player.set_traders(self.get_traders())
 
     def simulate_day(self):
+        """
+            Simulates a single day in the game, in which specific traders generate their
+            own deals based on the game's objects.
+        """
         # 1. Traders make deals
         # for trader_key in self.traders_key_list:
         #     trader = self.traders.__getitem__(trader_key)
         #     trader.generate_deal()
         
+        # Each trader from the trader list will generate a deal
         for trader in self.traders:
             trader.generate_deal()
         # for x in (self.get_traders()):
@@ -200,6 +239,8 @@ class SoloGame(Game):
         self.verify_output_and_update_quantities(food, balance, caves)
 
     def verify_output_and_update_quantities(self, food: Food | None, balance: float, caves: list[tuple[Cave, float]]) -> None:
+        """
+        """
         materials = self.player.get_materials_sold()
         expected_balance = 50 - food.item.get_price()
         for index in range(len(materials)):
@@ -306,6 +347,7 @@ class MultiplayerGame(Game):
             else:
                 food_list.append(None)
             the_players = player.select_food_and_caves()
+            self.verify_output_and_update_quantities()
 
         return tuple(the_players)
         
