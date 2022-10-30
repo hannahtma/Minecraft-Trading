@@ -7,6 +7,7 @@ from trader import Trader
 from food import Food
 from random_gen import RandomGen
 from node import TreeNode
+from hash_table import LinearProbeTable
 
 # List taken from https://minecraft.fandom.com/wiki/Mob
 PLAYER_NAMES = [
@@ -113,22 +114,33 @@ class Player():
         return self.foods
 
     def set_traders(self, traders_list: list[Trader]) -> None:
-        self.traders_list = traders_list
-        # print("This is trader list:")
-        # for x in self.traders_list:
-        #     print(x)
+        self.traders_list = AVLTree()
+        self.traders_key_list = []
+        number = 0
+        while number < len(traders_list):
+            if traders_list[number] not in self.traders_key_list:
+                self.traders_list.__setitem__(traders_list[number].get_buy_price(), traders_list[number])
+                self.traders_key_list.append(traders_list[number].get_buy_price())
+                number += 1
+            else:
+                traders_list[number].generate_deal()
 
     def set_foods(self, foods_list: list[Food]) -> None:
-        for food in foods_list:
-            food_item = TreeNode(food.get_hunger_bars(), food)
-            if self.foods.__contains__(food_item.key) != True:
-                self.foods.__setitem__(food_item.key, food_item.item)
-        # self.current = TreeNode(foods_list[len(foods_list)-1].get_hunger_bars(), foods_list[len(foods_list)-1])
+        self.foods_list = AVLTree()
+        self.foods_key_list = []
+        number = 0
+        while number < len(foods_list):
+            if foods_list[number] not in self.foods_key_list:
+                self.foods_list.__setitem__(foods_list[number].get_buy_price(), foods_list[number])
+                self.foods_key_list.append(foods_list[number].get_buy_price())
+                number += 1
+            else:
+                foods_list[number].generate_deal()
 
     @classmethod
     def random_player(self) -> Player:
         name = RandomGen.random_choice(PLAYER_NAMES)
-        balance = None
+        balance = RandomGen.randint(Player.MIN_EMERALDS, Player.MAX_EMERALDS)
 
         return Player(name, balance)
 
@@ -137,48 +149,36 @@ class Player():
         
     def set_caves(self, caves_list: list[Cave]) -> None:
         self.caves_list = caves_list
+        self.caves_hashed = LinearProbeTable()
+        for cave in caves_list:
+            self.caves_hashed.__setitem__(cave.get_name(),cave)
 
     def select_food_and_caves(self) -> tuple[Food | None, float, list[tuple[Cave, float]]]:
-        self.caves = []
-        food_choice = self.foods.get_maximal(self.foods.root)
-        print("food choice", food_choice)
+        self.foods_key_list.sort(reverse=True)
+        food_selected = None
+        index = 0
+        while food_selected == None:
+            food_choice = self.foods.__getitem__(index)
+            if self.balance < food_choice.get_buy_price():
+                index += 1
+            else:
+                self.balance -= food_choice.get_buy_price()
+                self.hunger_level = food_choice.get_hunger_bars()
+                food_selected = food_choice
 
-        self.hunger_bars = food_choice.item.get_hunger_bars()
-        self.balance -= food_choice.item.get_price()
-        print("hunger bars", self.hunger_bars)
-        print("balance: ", self.balance)
+        self.traders_key_list.sort(reverse=True)
+        index = 0
 
-        self.materials_sold = []
-        while self.hunger_bars > 0 and self.traders_list.is_empty() == False:
-            print("current self.hunger_bars:", self.hunger_bars)
-            print("current self.balance:", self.balance)
+        while self.hunger_level > 0:
+            material_to_mine = (self.traders_list.__getitem__(index)).get_material()
+            for cave in range(len(self.caves_list)):
+                if material_to_mine == self.caves_list[cave].get_material():
+                    
 
-            best_price = self.traders_list.get_maximal(self.traders_list.root)
-            self.traders_list.__delitem__(best_price.key)
-            # for x in self.traders_list:
-            #     print("trader",x)
-            print("best price: ", best_price)
 
-            item_to_buy = best_price.item.get_selected_material()
-            print("item to buy: ", item_to_buy)
 
-            # print("this is self.caves_list: ")
-            # print("here",type(self.caves_list))
-
-            for cave in self.caves_list:
-                print(cave)
-
-            for cave in self.caves_list:
-                if cave.get_material() == item_to_buy:
-                    the_cave = self.caves_list.index(cave)
-                    self.caves.append(the_cave)
-                    self.hunger_bars -= item_to_buy.get_mining_rate() * cave.get_quantity()
-                    print("after purchase: ", self.hunger_bars)
-                    self.balance += best_price.item.get_buy_price() * cave.get_quantity()
-                    self.materials_sold.append((cave,cave.get_quantity()))
-        print("this is materials sold",self.materials_sold)
         
-        return (food_choice, self.balance, self.caves)
+        return (food_selected, self.balance, self.caves)
 
     def __str__(self) -> str:
         return f"{self.name} {self.balance}💰"

@@ -142,7 +142,7 @@ class Material:
 
         Complexity: O(1)
         """
-        return Material(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(RandomGen.random_float(),2))
+        return Material(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(RandomGen.random(),2))
 
 if __name__ == "__main__":
     print(Material.random_material())

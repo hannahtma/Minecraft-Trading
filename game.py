@@ -8,7 +8,7 @@ from player import Player, PLAYER_NAMES
 from trader import Trader
 from material import Material
 from cave import Cave
-from food import Food
+from food import FOOD_NAMES, Food
 from random_gen import RandomGen
 from avl import AVLTree
 from trader import RandomTrader, RangeTrader, HardTrader
@@ -29,8 +29,9 @@ class Game:
     MAX_FOOD = 5
 
     def __init__(self) -> None:
-        self.materials = AVLTree()
-        self.traders = AVLTree()
+        self.materials = []
+        self.traders = []
+        self.caves = []
 
     def initialise_game(self) -> None:
         """Initialise all game objects: Materials, Caves, Traders."""
@@ -53,37 +54,19 @@ class Game:
         self.set_traders(traders)
     
     def set_materials(self, mats: list[Material]) -> None:
-        self.materials_key_list = []
-        for material in mats:
-            self.materials.__setitem__(material.get_mining_rate(), material)
-            self.materials_key_list.append(material.get_mining_rate())
+        self.materials = mats
 
     def set_caves(self, caves: list[Cave]) -> None:
-        self.caves = LinearProbeTable(len(caves))
-        # print("we are here",caves)
-        # print("THIS IS LEN(CAVES)", len(caves))
-        for cave in caves:
-            print("THIS IS OUR CAVE: ",cave)
-            # self.caves.__setitem__(cave.get_quantity(), cave)
-            # print(cave.get_name())
-            self.caves.__setitem__(cave.get_name(), cave)
-        
-        print("this is self.caves: ",str(self.caves))
+        self.caves = caves
 
     def set_traders(self, traders: list[Trader]) -> None:
-        self.traders_key_list = []
-        for trader in traders:
-            trader.generate_deal()
-            # print(trader)
-            self.traders.__setitem__(trader.get_buy_price(), trader)
-            self.traders_key_list.append(trader.get_buy_price())
-        # print(self.traders_key_list)
+        self.traders = traders
         
     def get_materials(self) -> list[Material]:
         return self.materials
 
     def get_caves(self) -> list[Cave]:
-        return self.caves.values()
+        return self.caves
 
     def get_traders(self) -> list[Trader]:
         return self.traders
@@ -183,19 +166,16 @@ class SoloGame(Game):
         self.verify_output_and_update_quantities(food, balance, caves)
 
     def verify_output_and_update_quantities(self, food: Food | None, balance: float, caves: list[tuple[Cave, float]]) -> None:
-        if food == self.player.get_foods().get_maximal(self.player.get_foods().root):
-            food_purchasable = True
-        
-        materials = self.player.get_materials_sold()
-        print(caves)
-        for cave in range(len(caves)):
-            the_cave = caves[cave]
-            quantity_to_check = materials.index(caves[cave])[1]
-            print("we are here",the_cave)
-            self.assertEqual(caves[cave].get_quantity(), quantity_to_check)
-            the_cave.remove_quantity(quantity_to_check)
+        # checks if the food choice is valid and has been bought
+        if food not in self.player.get_foods():
+            raise AssertionError("Food not in food list")
+        elif food == None:
+            raise AssertionError("Food not bought")
 
-        print("updated caves:", caves)
+        materials = self.player.get_materials_sold()
+
+        for index in range(len(caves)):
+            
 
 class MultiplayerGame(Game):
 
