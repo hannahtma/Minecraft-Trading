@@ -108,6 +108,13 @@ class Player():
     MAX_EMERALDS = 40
 
     def __init__(self, name, emeralds=None) -> None:
+        """
+            Instantiates a Player object
+
+            Parameters:
+                name: player's name
+                emeralds: number of emeralds a player has
+        """
         self.name = name
         self.balance = self.DEFAULT_EMERALDS if emeralds is None else emeralds
         self.hunger_bars = 0
@@ -163,15 +170,34 @@ class Player():
 
     @classmethod
     def random_player(self) -> Player:
+        """
+            Randomly generates a Player object with name from the list of PLAYER_NAMES and
+            balance from range MIN_EMERALDS to MAX_EMERALDS
+
+            Returns:
+                - Player object by passing these values to Player class
+
+            :complexity: O(1)
+        """
         name = RandomGen.random_choice(PLAYER_NAMES)
         balance = RandomGen.randint(Player.MIN_EMERALDS, Player.MAX_EMERALDS)
 
         return Player(name, balance)
 
     def set_materials(self, materials_list: list[Material]) -> None:
+        """
+            Sets specific material list for players into an AVL
+
+            :complexity: O(N) where N is the length of the materials_list
+        """
         self.materials_list = materials_list
         
     def set_caves(self, caves_list: list[Cave]) -> None:
+        """
+            Sets specific food list for players into a hash table
+
+            :complexity: O(N) where N is the length of the caves_list
+        """
         self.caves_list = LinearProbeTable(len(caves_list))
         for cave in caves_list:
             self.caves_list.__setitem__(cave.get_name(), cave)
@@ -264,4 +290,8 @@ class Player():
         return (food_choice, self.balance, self.caves)
 
     def __str__(self) -> str:
+        """
+            Returns a string representation of what a player object should look like.
+            Includes the player's name and the player's balance.
+        """
         return f"{self.name} {self.balance}💰"
