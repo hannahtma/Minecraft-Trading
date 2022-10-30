@@ -1,3 +1,7 @@
+""" Cave 
+
+Defines cave with getters for cave attributes
+"""
 from __future__ import annotations
 
 from material import Material
@@ -98,6 +102,9 @@ CAVE_NAMES = [
 ]
 
 class Cave:
+    """
+    Sets cave in a certain format
+    """
     
     def __init__(self, name: str, material: Material, quantity: float=0) -> None:
         """
@@ -129,7 +136,7 @@ class Cave:
         """
         Getter for name. Returns self.name
 
-        Complexity: O(1)
+        Complexity: O(1) for returning
         """
         return self.name 
         
@@ -137,7 +144,7 @@ class Cave:
         """
         Getter for material. Returns self.material
         
-        Complexity: O(1)
+        Complexity: O(1) for returning
         """
         return self.material
 
@@ -145,7 +152,7 @@ class Cave:
         """
         Getter for quantity. Returns self.quantity
         
-        Complexity: O(1)
+        Complexity: O(1) for returning
         """
         return self.quantity
 
@@ -153,14 +160,22 @@ class Cave:
         """
         String method. Returns string with format
         
-        Complexity: O(1)
+        Complexity: O(1) for returning
         """
         return f"{self.name} {self.quantity} {self.material}"
 
     @classmethod
     def random_cave(self, material_list: list[Material]) -> Cave:
-        random_name = RandomGen.random_choice(CAVE_NAMES)
-        random_material = RandomGen.random_choice(material_list)
+        """
+        Randomizes a cave and choose a material from the list provided
+
+        Parameters:
+            material_list - A list of materials to choose from when creating a cave
+
+        Complexity: O(1) for assigning values
+        """
+        random_name = RandomGen.random_choice(CAVE_NAMES) # gets the name of the cave
+        random_material = RandomGen.random_choice(material_list) # gets the material the cave stores
 
         return Cave(random_name, random_material)
 

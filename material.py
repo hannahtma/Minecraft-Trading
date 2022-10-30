@@ -1,3 +1,8 @@
+""" Material
+
+Defines material with getters for material attributes
+"""
+
 from random_gen import RandomGen
 
 # Material names taken from https://minecraft-archive.fandom.com/wiki/Items

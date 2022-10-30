@@ -1,3 +1,7 @@
+""" Trader
+
+Trader ADT and the 3 subclasses (RandomTrader, RangeTrader, HardTrader)
+"""
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
@@ -168,6 +172,9 @@ class Trader(ABC):
         pass
 
 class RandomTrader(Trader):
+    """
+    Trader that randomly selects the material to sell
+    """
 
     def __init__(self, name=None):
         """
@@ -177,9 +184,9 @@ class RandomTrader(Trader):
             name - Name of the trader
         """
         if name == None:
-            self.trader_name = RandomGen.random_choice(TRADER_NAMES)
+            self.name = RandomGen.random_choice(TRADER_NAMES)
         else:
-            self.trader_name = name
+            self.name = name
 
         self.material_selected = Material("",0)
         self.buy_price = 0
@@ -226,12 +233,27 @@ class RandomTrader(Trader):
             return False
 
     def get_name(self) -> str:
-        return self.trader_name
+        """
+        Returns the trader name
+
+        Complexity: O(1)
+        """
+        return self.name
 
     def get_buy_price(self) -> float:
+        """
+        Return the price they will buy the material for
+
+        Complexity: O(1)
+        """
         return self.buy_price
 
     def get_material_selected(self) -> Material:
+        """
+        Returns the material they chose to sell
+
+        Complexity: O(1)
+        """
         return self.material_selected
 
     def __str__(self) -> str:
@@ -240,9 +262,12 @@ class RandomTrader(Trader):
 
         Complexity: O(1)
         """
-        return f"<RandomTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
+        return f"<RandomTrader: {self.name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
 
 class RangeTrader(Trader):
+    """
+    Trader that selects the material from a range of mining rates to sell
+    """
 
     def __init__(self, name=None):
         """
@@ -252,9 +277,9 @@ class RangeTrader(Trader):
             name - Name of the trader
         """
         if name == None:
-            self.trader_name = RandomGen.random_choice(TRADER_NAMES)
+            self.name = RandomGen.random_choice(TRADER_NAMES)
         else:
-            self.trader_name = name
+            self.name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
@@ -326,12 +351,27 @@ class RangeTrader(Trader):
             return False
 
     def get_name(self) -> str:
-        return self.trader_name
+        """
+        Returns the trader name
+
+        Complexity: O(1)
+        """
+        return self.name
 
     def get_buy_price(self) -> float:
+        """
+        Return the price they will buy the material for
+
+        Complexity: O(1)
+        """
         return self.buy_price
 
     def get_material_selected(self) -> Material:
+        """
+        Returns the material they chose to sell
+
+        Complexity: O(1)
+        """
         return self.material_selected
 
     def __str__(self) -> str:
@@ -340,9 +380,12 @@ class RangeTrader(Trader):
 
         Complexity: O(1)
         """
-        return f"<RangeTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
+        return f"<RangeTrader: {self.name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
 
 class HardTrader(Trader):
+    """
+    Trader that selects the material with highest mining rate to sell
+    """
 
     def __init__(self, name=None):
         """
@@ -352,9 +395,9 @@ class HardTrader(Trader):
             name - Name of the trader
         """
         if name == None:
-            self.trader_name = RandomGen.random_choice(TRADER_NAMES)
+            self.name = RandomGen.random_choice(TRADER_NAMES)
         else:
-            self.trader_name = name
+            self.name = name
         self.material_selected = Material("",0)
         self.buy_price = 0
         self.materials = AVLTree()
@@ -402,12 +445,27 @@ class HardTrader(Trader):
             return False
 
     def get_name(self) -> str:
-        return self.trader_name
+        """
+        Returns the trader name
+
+        Complexity: O(1)
+        """
+        return self.name
 
     def get_buy_price(self) -> float:
+        """
+        Return the price they will buy the material for
+
+        Complexity: O(1)
+        """
         return self.buy_price
 
     def get_material_selected(self) -> Material:
+        """
+        Returns the material they chose to sell
+
+        Complexity: O(1)
+        """
         return self.material_selected
 
     def __str__(self) -> str:
@@ -416,7 +474,7 @@ class HardTrader(Trader):
 
         Complexity: O(1)
         """
-        return f"<HardTrader: {self.trader_name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
+        return f"<HardTrader: {self.name} buying [{self.material_selected.get_name()}: {self.material_selected.get_mining_rate()}🍗/💎] for {self.buy_price}💰>"
 
 if __name__ == "__main__":
     RandomGen.set_seed(16)

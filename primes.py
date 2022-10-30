@@ -1,4 +1,7 @@
-""""""
+""" Primes
+
+A largest prime number generator and iterator
+"""
 
 from __future__ import annotations
 
