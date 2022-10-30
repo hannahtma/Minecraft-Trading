@@ -1,5 +1,8 @@
+""" Cave 
+
+Defines cave with getters for cave attributes
+"""
 from __future__ import annotations
-from random import Random
 
 from material import Material
 from random_gen import RandomGen
@@ -99,45 +102,80 @@ CAVE_NAMES = [
 ]
 
 class Cave:
+    """
+    Sets cave in a certain format
+    """
     
     def __init__(self, name: str, material: Material, quantity: float=0) -> None:
+        """
+        Initializing Cave class instance variables
+
+        Complexity: O(1) for assigning values
+        """
         self.name = name
         self.material = material
         self.quantity = quantity
-        if self.quantity == 0:
-            self.quantity = round(RandomGen.randint(1, 10), 2)
-    
-    def get_name(self) -> str:
-        return self.name
-
-    def get_material(self) -> Material:
-        return self.material
     
     def add_quantity(self, amount: float) -> None:
+        """
+        Add cave quantity
+
+        Complexity: O(1) for incrementing
+        """
         self.quantity += amount
     
     def remove_quantity(self, amount: float) -> None:
+        """
+        Remove cave quantity
+
+        Complexity: O(1) for decrementing
+        """
         self.quantity -= amount
 
+    def get_name(self):
+        """
+        Getter for name. Returns self.name
+
+        Complexity: O(1) for returning
+        """
+        return self.name 
+        
+    def get_material(self):
+        """
+        Getter for material. Returns self.material
+        
+        Complexity: O(1) for returning
+        """
+        return self.material
+
     def get_quantity(self) -> float:
+        """
+        Getter for quantity. Returns self.quantity
+        
+        Complexity: O(1) for returning
+        """
         return self.quantity
 
     def __str__(self) -> str:
-        cave_string = f"{self.name}. {self.quantity} of {self.material.get_name()}"
-        return cave_string
-
-        # Caves = [
-        # (<Cave: Castle Karstaag Ruins. 4 of [Netherite Ingot: 20.95🍗/💎]>, 4.0), 
-        # (<Cave: Red Eagle Redoubt. 3 of [Fishing Rod: 26.93🍗/💎]>, 3.0),
-        # (<Cave: Glacial Cave. 3 of [Gold Nugget: 27.24🍗/💎]>, 3.0), 
-        # (<Cave: Boulderfall Cave. 10 of [Prismarine Crystal: 11.48🍗/💎]>, 10.0), 
-        # (<Cave: Orotheim. 6 of [Fishing Rod: 26.93🍗/💎]>, 2.335313776457482), 
-        # ]
+        """
+        String method. Returns string with format
+        
+        Complexity: O(1) for returning
+        """
+        return f"{self.name} {self.quantity} {self.material}"
 
     @classmethod
     def random_cave(self, material_list: list[Material]) -> Cave:
-        random_name = RandomGen.random_choice(CAVE_NAMES)
-        random_material = RandomGen.random_choice(material_list)
+        """
+        Randomizes a cave and choose a material from the list provided
+
+        Parameters:
+            material_list - A list of materials to choose from when creating a cave
+
+        Complexity: O(1) for assigning values
+        """
+        random_name = RandomGen.random_choice(CAVE_NAMES) # gets the name of the cave
+        random_material = RandomGen.random_choice(material_list) # gets the material the cave stores
 
         return Cave(random_name, random_material)
 
