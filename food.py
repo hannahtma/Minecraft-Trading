@@ -110,7 +110,7 @@ class Food:
     @classmethod
     def random_food(cls) -> Food:
         hunger_bars = RandomGen.randint(1, 500)
-        price = round(RandomGen.random_float(), 2)
+        price = RandomGen.randint(1, 50)
         return Food(RandomGen.random_choice(FOOD_NAMES), hunger_bars, price)
 
 if __name__ == "__main__":
