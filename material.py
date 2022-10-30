@@ -110,7 +110,7 @@ class Material:
 
     @classmethod
     def random_material(cls):
-        return Material(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(RandomGen.random_float(),2))
+        return Material(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(RandomGen.randint(1,50),2))
 
 if __name__ == "__main__":
     print(Material("Coal", 4.5))
