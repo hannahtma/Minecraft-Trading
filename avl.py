@@ -25,6 +25,14 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
 
         BinarySearchTree.__init__(self)
 
+    def get_root(self) -> AVLTreeNode:
+        """
+        Returns the root of the tree
+
+        Complexity: O(1)
+        """
+        return self.root
+
     def get_height(self, current: AVLTreeNode) -> int:
         """
             Get the height of a node. Return current.height if current is
@@ -50,7 +58,11 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
     def insert_aux(self, current: AVLTreeNode, key: K, item: I) -> AVLTreeNode:
         """
             Attempts to insert an item into the tree, it uses the Key to insert it
-            
+
+            :complexity best: O(CompK) inserts the item at the root.
+            :complexity worst: O(CompK * D) inserting at the bottom of the tree
+            where D is the depth of the tree
+            CompK is the complexity of comparing the keys
         """
         if current is None:  # base case: at the leaf
             current = AVLTreeNode(key, item)
@@ -74,6 +86,11 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         """
             Attempts to delete an item from the tree, it uses the Key to
             determine the node to delete.
+
+            :complexity best: O(CompK) deletes the item at the root.
+            :complexity worst: O(CompK * D) deletes at the bottom of the tree
+            where D is the depth of the tree
+            CompK is the complexity of comparing the keys
         """
         if current is None:  # key not found
             raise ValueError('Deleting non-existent item')
@@ -179,7 +196,6 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
 
         return new_root
-
 
     def rebalance(self, current: AVLTreeNode) -> AVLTreeNode:
         """ Compute the balance of the current node.

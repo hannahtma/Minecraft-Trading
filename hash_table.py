@@ -17,11 +17,7 @@ from primes import LargestPrimeIterator
 
 class LinearProbeTable(Generic[T]):
     MIN_CAPACITY = 1
-    PRIMES = [3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
-              1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519, 21023,
-              25229, 30313, 36353, 43627, 52361, 62851, 75521, 90523, 108631, 130363, 156437, 187751, 225307, 270371,
-              324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263, 1674319, 2009191, 2411033,
-              2893249, 3471899, 4166287, 4999559, 5999471, 7199369]
+
     """
         Linear Probe Table.
 
@@ -37,7 +33,6 @@ class LinearProbeTable(Generic[T]):
             
         """
 
-        
         self.conflict_count = 0
         self.probe_total = 0
         self.probe_max = 0
@@ -46,29 +41,35 @@ class LinearProbeTable(Generic[T]):
         self.count = 0
         self.expected_size = expected_size
         self.tablesize = tablesize_override
-        iterator = LargestPrimeIterator(self.expected_size, self.tablesize)
-        self.next_prime = iterator.__next__()
 
         if self.tablesize == -1:
-            self.tablesize = expected_size
+            self.tablesize = self.expected_size
+            self.iterator = LargestPrimeIterator(self.expected_size, 2)
+            self.tablesize = next(self.iterator)
+        else:
+            self.iterator = LargestPrimeIterator(self.expected_size, 2)
 
         self.table = ArrayR(max(self.MIN_CAPACITY, self.tablesize))
-
-        while len(self.table) > self.next_prime:
-            self.next_prime = iterator.__next__()
         
     def hash(self, key: str) -> int:
         """
             Hash a key for insertion into the hashtable.
-            :complexity: O(N) where N is length of key
+            :complexity: O(1)
         """
 
-        value = 0
+        # value = 0
 
-        for char in key:
-            value = (value * self.expected_size + ord(char)) % len(self.table)
+        # for char in key:
+        #     value = (value * self.expected_size + ord(char)) % len(self.table)
+        #     print(char, value)
 
-        return value
+        # return value
+
+        # print(ord(key[0]))
+        # print(self.tablesize)
+        # print(ord(key[0]) % self.tablesize)
+
+        return (ord(key[0]) % self.tablesize)
 
 
     def statistics(self) -> tuple:
@@ -106,24 +107,26 @@ class LinearProbeTable(Generic[T]):
         if is_insert and self.is_full():
             raise KeyError(key)
 
-        probe_length = 0
+        probe_length = 0 # set probe length to 0
         for _ in range(len(self.table)):  # start traversing
             if self.table[position] is None:  # found empty slot
                 if is_insert:
-                    self.is_linear_probe = True
+                    self.is_linear_probe = True # add a variable to see if this value will raise conflicts
                     return position
                 else:
                     raise KeyError(key)  # so the key is not in
-            if self.is_linear_probe == True:
-                self.conflict_count += 1
             elif self.table[position][0] == key:  # found key
                 return position
             else:  # there is something but not the key, try next
                 position = (position + 1) % len(self.table)
                 probe_length += 1
                 self.probe_total += 1
-            self.is_linear_probe = False
-
+            
+            if self.is_linear_probe == True:
+                # if the item inserted is linear probed, conflict count += 1
+                self.conflict_count += 1
+            self.is_linear_probe = False # reset is_linear_probe to 0
+            # if probe_length is greater than the current probe_max, then update probe_max
             if probe_length > self.probe_max:
                 self.probe_max = probe_length
 
@@ -177,10 +180,10 @@ class LinearProbeTable(Generic[T]):
             :see: #self.__contains__(key: str)
         """
 
-        position = self._linear_probe(key, True)
-
         if self.__len__() > self.tablesize // 2:
             self._rehash()
+        position = self._linear_probe(key, True)
+
         if self.table[position] is None:
             self.count += 1
 
@@ -215,8 +218,10 @@ class LinearProbeTable(Generic[T]):
             :complexity: O(N) where N is length of self.table
         """
 
-        self.rehash_count += 1
-        new_hash = LinearProbeTable(self.expected_size, self.next_prime)
+        self.rehash_count += 1 # each time enter rehash, rehash_count += 1
+        self.tablesize = next(self.iterator) # tablesize gets updated each time enter rehash
+
+        new_hash = LinearProbeTable(self.expected_size, self.tablesize)
 
         for item in range(len(self.table)):
             if self.table.__getitem__(item) != None:

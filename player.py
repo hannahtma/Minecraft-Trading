@@ -1,9 +1,13 @@
 from __future__ import annotations
+from avl import AVLTree
 
 from cave import Cave
 from material import Material
 from trader import Trader
 from food import Food
+from random_gen import RandomGen
+from node import TreeNode
+from hash_table import LinearProbeTable
 
 # List taken from https://minecraft.fandom.com/wiki/Mob
 PLAYER_NAMES = [
@@ -98,30 +102,83 @@ class Player():
     def __init__(self, name, emeralds=None) -> None:
         self.name = name
         self.balance = self.DEFAULT_EMERALDS if emeralds is None else emeralds
-        raise NotImplementedError()
+        self.foods = AVLTree()
+
+    def get_balance(self):
+        return self.balance
+
+    def get_materials_sold(self):
+        return self.materials_sold
+    
+    def get_foods(self):
+        return self.foods
 
     def set_traders(self, traders_list: list[Trader]) -> None:
-        raise NotImplementedError()
+        self.traders_list = AVLTree()
+        self.traders_key_list = []
+        number = 0
+        while number < len(traders_list):
+            if traders_list[number] not in self.traders_key_list:
+                self.traders_list.__setitem__(traders_list[number].get_buy_price(), traders_list[number])
+                self.traders_key_list.append(traders_list[number].get_buy_price())
+                number += 1
+            else:
+                traders_list[number].generate_deal()
 
     def set_foods(self, foods_list: list[Food]) -> None:
-        raise NotImplementedError()
+        self.foods_list = AVLTree()
+        self.foods_key_list = []
+        number = 0
+        while number < len(foods_list):
+            if foods_list[number] not in self.foods_key_list:
+                self.foods_list.__setitem__(foods_list[number].get_buy_price(), foods_list[number])
+                self.foods_key_list.append(foods_list[number].get_buy_price())
+                number += 1
+            else:
+                foods_list[number].generate_deal()
 
     @classmethod
     def random_player(self) -> Player:
-        raise NotImplementedError()
+        name = RandomGen.random_choice(PLAYER_NAMES)
+        balance = RandomGen.randint(Player.MIN_EMERALDS, Player.MAX_EMERALDS)
+
+        return Player(name, balance)
 
     def set_materials(self, materials_list: list[Material]) -> None:
-        raise NotImplementedError()
-
+        self.materials_list = materials_list
+        
     def set_caves(self, caves_list: list[Cave]) -> None:
-        raise NotImplementedError()
+        self.caves_list = caves_list
+        self.caves_hashed = LinearProbeTable()
+        for cave in caves_list:
+            self.caves_hashed.__setitem__(cave.get_name(),cave)
 
     def select_food_and_caves(self) -> tuple[Food | None, float, list[tuple[Cave, float]]]:
-        raise NotImplementedError()
+        self.foods_key_list.sort(reverse=True)
+        food_selected = None
+        index = 0
+        while food_selected == None:
+            food_choice = self.foods.__getitem__(index)
+            if self.balance < food_choice.get_buy_price():
+                index += 1
+            else:
+                self.balance -= food_choice.get_buy_price()
+                self.hunger_level = food_choice.get_hunger_bars()
+                food_selected = food_choice
+
+        self.traders_key_list.sort(reverse=True)
+        index = 0
+
+        while self.hunger_level > 0:
+            material_to_mine = (self.traders_list.__getitem__(index)).get_material()
+            for cave in range(len(self.caves_list)):
+                if material_to_mine == self.caves_list[cave].get_material():
+                    
+
+
+
+        
+        return (food_selected, self.balance, self.caves)
 
     def __str__(self) -> str:
-        raise NotImplementedError()
-
-if __name__ == "__main__":
-    print(Player("Steve"))
-    print(Player("Alex", emeralds=1000))
+        return f"{self.name} {self.balance}💰"

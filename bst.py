@@ -252,8 +252,23 @@ class BinarySearchTree(Generic[K, I]):
             Worst Complexity: O(D), where current is the root of the tree
             where D is the depth of the tree
         """
+        # if the current does not have a left node, it is the smallest in the subtree
         while current.left != None:
             current = current.left
+
+        return current
+
+    def get_maximal(self, current: TreeNode) -> TreeNode:
+        """
+        Get a node having the highest key in the current sub-tree.
+
+        Best Complexity: O(1), where current is the largest key node
+        Worst Complexity: O(D), where current is the root of the tree
+        where D is the depth of the tree
+        """
+        # checks all the way to the right to find the largest value in the subtree
+        while current.right != None:
+            current = current.right
 
         return current
 
