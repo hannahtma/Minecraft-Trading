@@ -485,7 +485,7 @@ class MultiplayerGame(Game):
 
         # initialize cave linked stack
         cave_stack = LinkedStack()
-        # while the balance is not empty
+        # while the balance is not empty
         while emeralds_avl.is_empty() == False:
             # get lowest balance
             the_smallest = emeralds_avl.get_minimal(emeralds_avl.get_root())
