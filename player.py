@@ -16,6 +16,7 @@ from trader import Trader
 from food import Food
 from random_gen import RandomGen
 from node import TreeNode
+from linked_stack import LinkedStack
 
 # List taken from https://minecraft.fandom.com/wiki/Mob
 PLAYER_NAMES = [
@@ -117,6 +118,8 @@ class Player():
             Parameters:
                 name: player's name
                 emeralds: number of emeralds a player has at the start of a game
+
+            Best and Worst Complexity: O(1) 
         """
         self.name = name
         # if the emeralds is not given, uses default emerald value as balance
@@ -127,7 +130,7 @@ class Player():
         """
         Returns name of player
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.name
 
@@ -135,7 +138,7 @@ class Player():
         """
         Returns number of emeralds the player has
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.balance
 
@@ -143,7 +146,7 @@ class Player():
         """
         Returns the list of materials that the player mined
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.materials_mined
     
@@ -151,7 +154,7 @@ class Player():
         """
         Returns the number of hunger bars the player has
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.hunger_bars
     
@@ -172,6 +175,11 @@ class Player():
         return self.foods
     
     def set_hunger_bars(self, bars) -> None:
+        """
+        Sets self.hunger_bars by decrementing it according to bars
+
+        Complexity: O(1)
+        """
         self.hunger_bars -= bars
 
     def set_traders(self, traders_list: list[Trader]) -> None:
@@ -219,7 +227,7 @@ class Player():
                 foods_list[number].random_food()
 
     @classmethod
-    def random_player(self) -> Player:
+    def random_player(cls) -> Player:
         """
             Randomly generates a Player object with name from the list of PLAYER_NAMES and
             balance from range MIN_EMERALDS to MAX_EMERALDS
@@ -233,7 +241,7 @@ class Player():
         name = RandomGen.random_choice(PLAYER_NAMES)
         balance = RandomGen.randint(Player.MIN_EMERALDS, Player.MAX_EMERALDS)
 
-        return Player(name, balance)
+        return cls(name, balance)
 
     def set_materials(self, materials_list: list[Material]) -> None:
         """
@@ -289,34 +297,39 @@ class Player():
                 self.balance -= food_choice.item.get_price() # pay the money for the food
                 self.hunger_bars = food_choice.item.get_hunger_bars() # eat the food
                 food_selected = food_choice # food is eaten
-        print(food_selected)
-        print(self.balance)
         
         # choosing the highest selling material to mine and entering the cave that houses it to mine
         # complexity: O(T + C)
         # where T is the number of traders and C is the number of caves
         self.caves = []
         self.materials_mined = []
-        while self.hunger_bars > 0 and self.traders_list.is_empty() == False: # 
+
+        # Keeps looping until hunger bars are depleted
+        while self.hunger_bars > 0 and self.traders_list.is_empty() == False: 
+            # Gets the best price a trader is selling for
             trader_best_price = self.traders_list.get_maximal(self.traders_list.root) # O(T)
-            print(trader_best_price)
             self.traders_list.__delitem__(trader_best_price.key) # O(T)
+            # Gets the material that the trader is selling
             item_to_buy = (trader_best_price.item).get_material_selected() # O(1)
             cave_values = self.caves_list.values() # list of cave objects O(1)
+            # Goes through cave_values to find which cave to mine
             for cave in cave_values: # O(C)
                 cave_quantity = cave.get_material().get_mining_rate() * cave.get_quantity() # O(1)
                 if cave.get_material() == item_to_buy:
                     self.caves.append((cave, cave.get_quantity())) # O(1)
+                    # If the player doesn't have enough hunger_bars to mine all materials, 
+                    # the player will mine until hunger bars have finished
                     if cave_quantity > self.hunger_bars: 
                         how_many_mined = self.hunger_bars / cave.get_material().get_mining_rate() # O(1)
                         self.materials_mined.append((cave, how_many_mined)) # O(1)
                         self.hunger_bars -= item_to_buy.get_mining_rate() * how_many_mined # O(1)
                         self.balance += trader_best_price.item.get_buy_price() * how_many_mined # O(T)
+                    # If the player has enough hunger_bars to mine all materials,
+                    # the player will mine all materials
                     else:
                         self.materials_mined.append((cave, cave.get_quantity())) # O(1)
                         self.hunger_bars -= item_to_buy.get_mining_rate() * cave.get_quantity() # O(1)
                         self.balance += trader_best_price.item.get_buy_price() * cave.get_quantity() # O(T)
-            print(self.balance)
 
         return (food_selected, self.balance, self.caves)
 
