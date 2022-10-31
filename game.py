@@ -110,6 +110,7 @@ class Game:
         self.traders = traders
         
     def get_materials(self) -> list[Material]:
+        
         return self.materials
 
     def get_caves(self) -> list[Cave]:
