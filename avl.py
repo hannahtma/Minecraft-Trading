@@ -206,6 +206,8 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
             - a combination of left + right rotate
             - a combination of right + left rotate
             returns the new root of the subtree.
+
+            Best case = Worst case = O(1)
         """
         if self.get_balance(current) >= 2:
             child = current.right
@@ -225,7 +227,8 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
         """
         Returns a sorted list of all elements in the tree between the ith and jth indices, inclusive.
         
-        :complexity: O(j - i + log(N))
+        best case complexity: O(1) where j integer is more than the length of the tree
+        worst case complexity: O(j - i + log(N))
         where N is the number of total nodes
         """
         ranged_list = [] # creates empty list
@@ -239,5 +242,3 @@ class AVLTree(BinarySearchTree, Generic[K, I]):
                 n += 1
 
         return ranged_list
-
-

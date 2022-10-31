@@ -61,6 +61,3 @@ if __name__ == '__main__':
     it1 = LargestPrimeIterator(6,2)
     for i in range(5):
         print(next(it1))
-
-
-    

@@ -30,6 +30,8 @@ class LinearProbeTable(Generic[T]):
     def __init__(self, expected_size: int, tablesize_override: int = -1) -> None:
         """
             Initialiser.
+
+            Best and Worst Complexity: O(1) 
             
         """
 
@@ -54,23 +56,9 @@ class LinearProbeTable(Generic[T]):
     def hash(self, key: str) -> int:
         """
             Hash a key for insertion into the hashtable.
-            :complexity: O(1)
+            Best and Worst Complexity: O(1) 
         """
-
-        # value = 0
-
-        # for char in key:
-        #     value = (value * self.expected_size + ord(char)) % len(self.table)
-        #     print(char, value)
-
-        # return value
-
-        # print(ord(key[0]))
-        # print(self.tablesize)
-        # print(ord(key[0]) % self.tablesize)
-
         return (ord(key[0]) % self.tablesize)
-
 
     def statistics(self) -> tuple:
         """
@@ -179,6 +167,8 @@ class LinearProbeTable(Generic[T]):
             :see: #self._linear_probe(key: str, is_insert: bool)
             :see: #self.__contains__(key: str)
         """
+        if self.__len__() > self.tablesize // 2:
+            self._rehash()
 
         if self.__len__() > self.tablesize // 2:
             self._rehash()
@@ -215,7 +205,7 @@ class LinearProbeTable(Generic[T]):
         """
             Need to resize table and reinsert all values
 
-            :complexity: O(N) where N is length of self.table
+            :best and worst complexity: O(N) where N is length of self.table
         """
 
         self.rehash_count += 1 # each time enter rehash, rehash_count += 1

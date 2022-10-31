@@ -117,10 +117,3 @@ class TestBST(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    # a = TestBST()
-    # #a.check_invariant()
-    # a.testInvariant()
-    # a.testDelete()
-    # a.testMinimal()
-    # a.testSuccessor()
-    # a.testInOrder()

@@ -110,17 +110,19 @@ class Cave:
         """
         Initializing Cave class instance variables
 
-        Complexity: O(1) for assigning values
+        Best and Worst Complexity: O(1) 
         """
         self.name = name
         self.material = material
         self.quantity = quantity
-    
+        if self.quantity == 0:
+            self.quantity = round(RandomGen.randint(1, 10), 2)
+
     def add_quantity(self, amount: float) -> None:
         """
         Add cave quantity
 
-        Complexity: O(1) for incrementing
+        Best and Worst Complexity: O(1) 
         """
         self.quantity += amount
     
@@ -128,7 +130,7 @@ class Cave:
         """
         Remove cave quantity
 
-        Complexity: O(1) for decrementing
+        Best and Worst Complexity: O(1) 
         """
         self.quantity -= amount
 
@@ -136,7 +138,7 @@ class Cave:
         """
         Getter for name. Returns self.name
 
-        Complexity: O(1) for returning
+        Best and Worst Complexity: O(1) 
         """
         return self.name 
         
@@ -144,7 +146,7 @@ class Cave:
         """
         Getter for material. Returns self.material
         
-        Complexity: O(1) for returning
+        Best and Worst Complexity: O(1) 
         """
         return self.material
 
@@ -152,7 +154,7 @@ class Cave:
         """
         Getter for quantity. Returns self.quantity
         
-        Complexity: O(1) for returning
+        Best and Worst Complexity: O(1) 
         """
         return self.quantity
 
@@ -160,24 +162,24 @@ class Cave:
         """
         String method. Returns string with format
         
-        Complexity: O(1) for returning
+        Best and Worst Complexity: O(1) 
         """
         return f"{self.name} {self.quantity} {self.material}"
 
     @classmethod
-    def random_cave(self, material_list: list[Material]) -> Cave:
+    def random_cave(cls, material_list: list[Material]) -> Cave:
         """
         Randomizes a cave and choose a material from the list provided
 
         Parameters:
             material_list - A list of materials to choose from when creating a cave
 
-        Complexity: O(1) for assigning values
+        Best and Worst Complexity: O(1) 
         """
         random_name = RandomGen.random_choice(CAVE_NAMES) # gets the name of the cave
         random_material = RandomGen.random_choice(material_list) # gets the material the cave stores
 
-        return Cave(random_name, random_material)
+        return cls(random_name, random_material)
 
 
 if __name__ == "__main__":

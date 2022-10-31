@@ -2,7 +2,7 @@ from cave import Cave
 from material import Material
 from random_gen import RandomGen
 import unittest
-
+from random_gen import RandomGen
 
 class TestCave(unittest.TestCase):
     """ Testing additional AVL functionality. """

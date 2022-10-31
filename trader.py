@@ -102,7 +102,7 @@ class Trader(ABC):
 
         Complexity: O(1)
         """
-        return RandomGen.random_choice([RandomTrader(),RangeTrader(),HardTrader()])
+        return cls(RandomGen.random_choice(TRADER_NAMES))
     
     def set_all_materials(self, mats: list[Material]) -> None:
         """
@@ -490,5 +490,4 @@ if __name__ == "__main__":
 
     rando.generate_deal()
     print(rando)
-
-
+    

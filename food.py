@@ -110,7 +110,7 @@ class Food:
             hunger_bars - Amount of hunger bars the food replenishes
             price - Cost of food
 
-        Complexity: O(1) 
+        Best and Worst Complexity: O(1) 
         """
         self.name = name
         self.hunger_bars = hunger_bars
@@ -120,7 +120,7 @@ class Food:
         """
         Returns hunger bars a food replenishes
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.hunger_bars
     
@@ -128,7 +128,7 @@ class Food:
         """
         Returns price of food
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.price
     
@@ -136,23 +136,23 @@ class Food:
         """
         String method. Returns string with format
         
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
-        return f"{self.name}"
+        return f"{self.name} {self.price} {self.hunger_bars}"
 
     @classmethod
     def random_food(cls) -> Food:
         """
         Randomizes a food name, hunger bars and price
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
-        hunger_bars = RandomGen.randint(1, 500) # gets a hunger bar level
-        price = round(RandomGen.random_float(), 2) # gets a price
-        return Food(RandomGen.random_choice(FOOD_NAMES), hunger_bars, price)
+        hunger_bars = RandomGen.randint(1, 500)
+        price = RandomGen.randint(1, 50)
+        return cls(RandomGen.random_choice(FOOD_NAMES), hunger_bars, price)
+    
 
 if __name__ == "__main__":
     print(Food.random_food())
 
     print(Food.random_food())
-
