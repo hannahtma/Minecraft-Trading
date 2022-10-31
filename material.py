@@ -103,7 +103,7 @@ class Material:
             name - Name of the material
             mining_rate - How much hunger bars it takes to mine the material
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         if name == None or mining_rate == None: 
             # when there are empty values, randomizes material name and mining rate
@@ -115,7 +115,7 @@ class Material:
         """
         Getter for mining rate
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.mining_rate
 
@@ -123,7 +123,7 @@ class Material:
         """
         Getter for name
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return self.name
     
@@ -131,7 +131,7 @@ class Material:
         """
         Creates a string representation of the class
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
         return f"{self.name} {self.mining_rate}"
 
@@ -140,9 +140,9 @@ class Material:
         """
         Randomizes a material and it's mining rate
 
-        Complexity: O(1)
+        Best and Worst Complexity: O(1) 
         """
-        return Material(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(2 + 25 * RandomGen.random_float(), 2))
+        return cls(RandomGen.random_choice(RANDOM_MATERIAL_NAMES),round(2 + 25 * RandomGen.random_float(), 2))
 
 if __name__ == "__main__":
     print(Material.random_material())
