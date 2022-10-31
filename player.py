@@ -101,6 +101,9 @@ PLAYER_NAMES = [
 ]
 
 class Player():
+    """
+    Player class that stores functions used by a player
+    """
 
     DEFAULT_EMERALDS = 50
 
@@ -113,26 +116,63 @@ class Player():
 
             Parameters:
                 name: player's name
-                emeralds: number of emeralds a player has
+                emeralds: number of emeralds a player has at the start of a game
         """
         self.name = name
+        # if the emeralds is not given, uses default emerald value as balance
         self.balance = self.DEFAULT_EMERALDS if emeralds is None else emeralds
         self.hunger_bars = 0
 
     def get_name(self):
+        """
+        Returns name of player
+
+        Complexity: O(1)
+        """
         return self.name
 
     def get_balance(self):
+        """
+        Returns number of emeralds the player has
+
+        Complexity: O(1)
+        """
         return self.balance
 
-    def get_materials_sold(self):
-        return self.materials_sold
+    def get_materials_mined(self):
+        """
+        Returns the list of materials that the player mined
+
+        Complexity: O(1)
+        """
+        return self.materials_mined
     
     def get_hunger_bars(self):
+        """
+        Returns the number of hunger bars the player has
+
+        Complexity: O(1)
+        """
         return self.hunger_bars
     
+    def get_original_hunger_bars(self):
+        """
+        Returns the original number of hunger bars the player has
+
+        Complexity: O(1)
+        """
+        return self.original_hunger_bars
+    
     def get_foods(self):
+        """
+        Returns the list of foods
+
+        Complexity: O(1)
+        """
         return self.foods
+    
+    def set_hunger_bars(self, bars) -> None:
+        self.hunger_bars -= bars
 
     def set_traders(self, traders_list: list[Trader]) -> None:
         """
@@ -140,15 +180,21 @@ class Player():
             
             :complexity: O(N) where N is the length of the traders_list
         """
+        # we chose to use an AVLTree for convenience of finding the trader with max buy price
         self.traders_list = AVLTree()
-        self.traders_key_list = []
+        self.traders_key_list = [] # used for convenience of accessing values in the tree
+        self.traders_material = [] # compiles the materials that all traders sell
         number = 0
         while number < len(traders_list):
             if traders_list[number].get_buy_price() not in self.traders_key_list:
+                # if the trader's buy price doesn't exist in the key list, add trader into the tree
+                # we cannot have duplicate keys for AVL as it will cause an error
                 self.traders_list.__setitem__(traders_list[number].get_buy_price(),traders_list[number]) 
                 self.traders_key_list.append(traders_list[number].get_buy_price())
+                self.traders_material.append(traders_list[number].get_material_selected())
                 number += 1
             else:
+                # if the trader's buy price exists in the key list, regenerate the deal
                 traders_list[number].generate_deal()
 
     def set_foods(self, foods_list: list[Food]) -> None:
@@ -157,15 +203,19 @@ class Player():
 
             :complexity: O(N) where N is the length of the foods_list
         """
+        # we chose to use an AVLTree for convenience of finding the food with the highest hunger bars level
         self.foods = AVLTree()
-        self.foods_key_list = []
+        self.foods_key_list = [] # used for convenience of accessing values in the tree
         number = 0
         while number < len(foods_list):
             if foods_list[number].get_hunger_bars() not in self.foods_key_list:
+                # if the food's hunger bars doesn't exist in the key list, add food into the tree
+                # we cannot have duplicate keys for AVL as it will cause an error
                 self.foods.__setitem__(foods_list[number].get_hunger_bars(),foods_list[number])
                 self.foods_key_list.append(foods_list[number].get_hunger_bars())
                 number += 1
             else:
+                # if the food's hunger bars exists in the key list, randomize the food
                 foods_list[number].random_food()
 
     @classmethod
@@ -179,6 +229,7 @@ class Player():
 
             :complexity: O(1)
         """
+        # randomizes the player name and balance for variety
         name = RandomGen.random_choice(PLAYER_NAMES)
         balance = RandomGen.randint(Player.MIN_EMERALDS, Player.MAX_EMERALDS)
 
@@ -198,96 +249,76 @@ class Player():
 
             :complexity: O(N) where N is the length of the caves_list
         """
+        # saves the list of caves into a hash table with the cave names as the key
         self.caves_list = LinearProbeTable(len(caves_list))
-        for cave in caves_list:
-            self.caves_list.__setitem__(cave.get_name(), cave)
+        cave_names = [] # used for convenience of accessing values in the hash table
+        number = 0
+        while number < len(caves_list):
+            if caves_list[number].get_name() not in cave_names:
+                # if the cave name doesn't exist in the name list, add cave into the hash table
+                # we cannot have duplicate keys for hash tables as it will cause an error
+                self.caves_list.__setitem__(caves_list[number].get_name(), caves_list[number])
+                cave_names.append(caves_list[number].get_name())
+                number += 1
+            else:
+                # if the cave name exists in the name list, randomize the cave again
+                caves_list[number] = caves_list[number].random_cave(self.materials_list)
 
     def select_food_and_caves(self) -> tuple[Food | None, float, list[tuple[Cave, float]]]:
         """
             1. Choose the food that gives the most hunger bars and deduct the hunger bars
             off the player's hunger bars.
             2. Find which trader has the highest bidding price and get the material name.
-            3. Go into the cave which contains the material the player wishes to mine.
+            3. Go into the cave which contains the material of highest mining price.
             4. Then, mine all possible material quantity if the player has enough hunger bars.
-            5. Steps 2-4 is repeated until the player runs out of hunger bars.
+            5. Steps 2-4 is repeated until the player runs out of hunger bars or there are no more materials that can be mined and sold.
 
-            :complexity: O(N)
+            :complexity: O(T + C + F * log F)
         """      
+        # selecting the food to buy
+        # best complexity: O(F)
+        # worst complexity: O(F * log F)
+        # where F is the number of foods there are
+        food_selected = None
+        self.original_hunger_bars = self.balance
+        while food_selected == None: # loops until the player is able to buy a food
+            food_choice = (self.foods.get_maximal(self.foods.root)) # finds the food with the highest value of hunger bars
+            if self.balance < food_choice.item.get_price(): # if the food is too expensive
+                self.foods.__delitem__(food_choice.key) # deletion of an AVLTreeNode is logN
+            else: # if the food is purchasable
+                self.balance -= food_choice.item.get_price() # pay the money for the food
+                self.hunger_bars = food_choice.item.get_hunger_bars() # eat the food
+                food_selected = food_choice # food is eaten
+        print(food_selected)
+        print(self.balance)
+        
+        # choosing the highest selling material to mine and entering the cave that houses it to mine
+        # complexity: O(T + C)
+        # where T is the number of traders and C is the number of caves
         self.caves = []
-        food_choice = self.foods.get_maximal(self.foods.root)
-        print("food choice", food_choice)
+        self.materials_mined = []
+        while self.hunger_bars > 0 and self.traders_list.is_empty() == False: # 
+            trader_best_price = self.traders_list.get_maximal(self.traders_list.root) # O(T)
+            print(trader_best_price)
+            self.traders_list.__delitem__(trader_best_price.key) # O(T)
+            item_to_buy = (trader_best_price.item).get_material_selected() # O(1)
+            cave_values = self.caves_list.values() # list of cave objects O(1)
+            for cave in cave_values: # O(C)
+                cave_quantity = cave.get_material().get_mining_rate() * cave.get_quantity() # O(1)
+                if cave.get_material() == item_to_buy:
+                    self.caves.append((cave, cave.get_quantity())) # O(1)
+                    if cave_quantity > self.hunger_bars: 
+                        how_many_mined = self.hunger_bars / cave.get_material().get_mining_rate() # O(1)
+                        self.materials_mined.append((cave, how_many_mined)) # O(1)
+                        self.hunger_bars -= item_to_buy.get_mining_rate() * how_many_mined # O(1)
+                        self.balance += trader_best_price.item.get_buy_price() * how_many_mined # O(T)
+                    else:
+                        self.materials_mined.append((cave, cave.get_quantity())) # O(1)
+                        self.hunger_bars -= item_to_buy.get_mining_rate() * cave.get_quantity() # O(1)
+                        self.balance += trader_best_price.item.get_buy_price() * cave.get_quantity() # O(T)
+            print(self.balance)
 
-        self.hunger_bars = food_choice.item.get_hunger_bars()
-        # self.hunger_bars -= food_choice
-        self.balance -= food_choice.item.get_price()
-        print("hunger bars", self.hunger_bars)
-        print("balance: ", self.balance)
-
-        self.materials_sold = []
-        print(self.traders_list.is_empty())
-        while self.hunger_bars > 0 and self.traders_list.is_empty() == False and len(self.materials_sold) <= len(self.caves):
-            print("current self.hunger_bars:", self.hunger_bars)
-            print("current self.balance:", self.balance)
-
-            best_price = self.traders_list.get_maximal(self.traders_list.root)
-            # self.traders_list.__delitem__(best_price.key)
-            # for x in self.traders_list:
-            #     print("trader",x)
-            print("best price: ", best_price)
-
-            item_to_buy = best_price.item.get_selected_material()
-            print("item to buy: ", item_to_buy)
-
-            # print("this is self.caves_list: ")
-            # print("here",type(self.caves_list))
-            cave_values = self.caves_list.values()
-            print(cave_values)
-            # for cave in self.caves_list:
-
-            # ignore this
-            
-
-
-            profit_heap = MaxHeap(len(cave_values))
-            cost_heap = MaxHeap(len(cave_values))
-            for cave in cave_values:
-                the_profit = best_price.item.get_buy_price() * cave.get_quantity()
-                at_what_cost = cave.get_material().get_mining_rate() * cave.get_quantity()
-                profit_heap.add(the_profit)
-                cost_heap.add(at_what_cost)
-                self.materials_sold.append((cave, cave.get_quantity()))
-                # self.caves.append(cave)
-
-            max_profit = profit_heap.get_max()
-            print("current max profit",max_profit)
-            hunger_cost = cost_heap.get_max()
-            print("current hunger cost",hunger_cost)
-            while self.hunger_bars - hunger_cost > 0:
-                self.hunger_bars -= hunger_cost
-                print("after buying: ", self.hunger_bars)
-                self.balance += max_profit
-                print("after selling",self.balance)
-                max_profit = profit_heap.get_max()
-                print("current max profit",max_profit)
-                hunger_cost = cost_heap.get_max()
-                print("current hunger cost",hunger_cost)
-            print("how many hunger bars left?",self.hunger_bars)
-            #     print("the cave",cave)
-            #     if cave.get_material() == item_to_buy:
-            #         cave_index = cave_values.index(cave)
-            #         self.caves.append((cave_values[cave_index], cave_values[cave_index].get_quantity()))
-            #         quantity_bought = 0
-            #         while self.hunger_bars - item_to_buy.get_mining_rate() > 0:
-            #             self.hunger_bars -= item_to_buy.get_mining_rate()
-            #             print("after purchase: ", self.hunger_bars)
-            #             self.balance += best_price.item.get_buy_price()
-            #             quantity_bought += 1
-            #             break
-            #         self.materials_sold.append((cave, quantity_bought))
-            #         quantity_bought = 0
-            # break
-
-        return (food_choice, self.balance, self.caves)
+        return (food_selected, self.balance, self.caves)
 
     def __str__(self) -> str:
         """
