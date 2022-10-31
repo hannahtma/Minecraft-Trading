@@ -11,13 +11,12 @@ from hash_table import LinearProbeTable
 from node import TreeNode
 
 from player import Player, PLAYER_NAMES
-from trader import Trader
+from trader import Trader, RandomTrader, RangeTrader, HardTrader
 from material import Material
 from cave import Cave
 from food import Food
 from random_gen import RandomGen
 from avl import AVLTree
-from trader import RandomTrader, RangeTrader, HardTrader
 from heap import MaxHeap
 from linked_stack import LinkedStack
 
@@ -37,7 +36,7 @@ class Game:
 
     def __init__(self) -> None:
         """
-            Instantiates a game object
+            Instantiates a Game object
         """
         self.materials = AVLTree()
         self.traders = AVLTree()
@@ -61,9 +60,14 @@ class Game:
 
     def initialise_with_data(self, materials: list[Material], caves: list[Cave], traders: list[Trader]):
         """
-            Initialize the materials, caves, and traders to the parameter arguments
+            Initialize the materials, caves, traders as the given data
 
-            Complexity: o()
+            Parameters:
+                - materials : the list of materials
+                - caves     : the list of caves
+                - traders   : the list of traders
+            
+            :complexity: O(1)
         """
         self.set_materials(materials)
         self.set_caves(caves)
@@ -78,10 +82,6 @@ class Game:
 
             :complexity: O(1)
         """
-        # self.materials_key_list = []
-        # for material in mats:
-        #     self.materials.__setitem__(material.get_mining_rate(), material)
-        #     self.materials_key_list.append(material.get_mining_rate())
         self.materials = mats
 
     def set_caves(self, caves: list[Cave]) -> None:
@@ -110,24 +110,39 @@ class Game:
         self.traders = traders
         
     def get_materials(self) -> list[Material]:
-                """
-        Returns the material list
+        """
+            Returns the material list
 
-        Complexity: O(1)
+            :complexity: O(1)
         """
         return self.materials
 
     def get_caves(self) -> list[Cave]:
+        """
+            Returns the caves list
+
+            :complexity: O(1)
+        """
         return self.caves
 
     def get_traders(self) -> list[Trader]:
+        """
+            Returns the trader list
+
+            :complexity: O(1)
+        """
         return self.traders
 
     def generate_random_materials(self, amount):
         """
-        Generates <amount> random materials using Material.random_material
-        Generated materials must all have different names and different mining_rates.
-        (You may have to call Material.random_material more than <amount> times.)
+            Generates <amount> random materials using Material.random_material
+            Generated materials must all have different names and different mining_rates.
+            (You may have to call Material.random_material more than <amount> times.)
+
+            Parameters:
+                - amount: the number of materials to be generated
+
+            :complexity: O(N) where N is amount
         """
         materials_generated = []
         material_names = []
@@ -144,9 +159,14 @@ class Game:
 
     def generate_random_caves(self, amount):
         """
-        Generates <amount> random caves using Cave.random_cave
-        Generated caves must all have different names
-        (You may have to call Cave.random_cave more than <amount> times.)
+            Generates <amount> random caves using Cave.random_cave
+            Generated caves must all have different names
+            (You may have to call Cave.random_cave more than <amount> times.)
+            
+            Parameters:
+                - amount: the number of caves to be generated
+
+            :complexity: O(N) where N is amount
         """
         random_caves = []
         cave_names = []
@@ -162,15 +182,21 @@ class Game:
 
     def generate_random_traders(self, amount):
         """
-        Generates <amount> random traders by selecting a random trader class
-        and then calling <TraderClass>.random_trader()
-        and then calling set_all_materials with some subset of the already generated materials.
-        Generated traders must all have different names
-        (You may have to call <TraderClass>.random_trader() more than <amount> times.)
+            Generates <amount> random traders by selecting a random trader class
+            and then calling <TraderClass>.random_trader()
+            and then calling set_all_materials with some subset of the already generated materials.
+            Generated traders must all have different names
+            (You may have to call <TraderClass>.random_trader() more than <amount> times.)
+
+            Parameters:
+                - amount: the number of traders to be generated
+
+            :complexity: O(n) where n is the amount of traders to be generated
         """
         random_traders = []
         for _ in range(amount):
-            trader = Trader.random_trader()
+            trader_type = RandomGen.random_choice([RandomTrader(Trader),RangeTrader(Trader),HardTrader(Trader)])
+            trader = trader_type.random_trader()
             random_traders.append(trader)
             trader.set_all_materials(self.materials)
         self.set_traders(random_traders)
@@ -205,29 +231,34 @@ class SoloGame(Game):
         """
             Initialises game using specific data.
             Sets all game objects to the data passed through.
+            
+            Parameters:
+                - materials : the list of materials
+                - caves     : the list of caves
+                - traders   : the list of traders
+                - player_names: the list of player integers
+                - emerald_info: the list of balances
+            
+            :complexity: O(M + C + T)
         """
         super().initialise_with_data(materials, caves, traders)
         self.player = Player(player_names[0], emeralds=emerald_info[0])
         self.player.set_materials(self.get_materials())
-        for x in self.get_materials():
-            print(x)
         self.player.set_caves(self.get_caves())
-        for x in self.get_caves():
-            print(x)
         self.player.set_traders(self.get_traders())
-        for x in self.get_traders():
-            print(x)
 
     def simulate_day(self):
         """
             Simulates a single day in the game, in which specific traders generate their
             own deals based on the game's objects.
+
+            :complexity: O(n) where n is the self.traders or food_num
         """
         # 1. Traders make deals    
         # Each trader from the trader list will generate a deal
         for trader in self.traders:
             trader.generate_deal()
-        self.player.set_traders(self.get_traders())
+        self.set_traders(self.get_traders())
         print("Traders Deals:\n\t", end="")
         print("\n\t".join(map(str, self.get_traders())))
         # 2. Food is offered
@@ -250,7 +281,7 @@ class SoloGame(Game):
             Calculates the expected balance based on the list of materials that the player has mined
             and verifies that the balance is the same as the expected balance.
             Updates the quantities of materials in caves by referencing the quantities
-            in the list of materials mined
+            in the list of materials mined.
 
             Parameters:
                 - food: food that the player bought
@@ -266,7 +297,6 @@ class SoloGame(Game):
             for trader in range(len(self.traders)):
                 if self.traders[trader].get_material_selected() == the_material: #checks whether it is the same material
                     expected_balance += self.traders[trader].get_buy_price() * materials[index][1]
-
         for cave in range(len(caves)):
             original_cave = caves[cave]
             original_caves_quantity = caves[cave][1]
@@ -278,6 +308,7 @@ class SoloGame(Game):
                 raise ValueError("The quantities are wrong.")
         print("The quantities are correct.")
 
+        # if no food is put in,  
         if food != None:
             print("The food is purchasable.")
         else:
@@ -294,12 +325,29 @@ class MultiplayerGame(Game):
     MAX_PLAYERS = 5
 
     def __init__(self) -> None:
+        """
+            Instantiates a MultiplayerGame object
+        """
         super().__init__()
         self.players = []
         for player in self.players:
             self.player = player
+        self.day_number = 1
+    
+    def get_the_food(self):
+        """
+            Returns the food
+
+            :complexity: O(1)
+        """
+        return self.the_food
 
     def initialise_game(self) -> None:
+        """
+            Initialises the game for multiple players.
+            Players are randomly generated and all game objects are initialised
+            based on the game's random generation.
+        """
         super().initialise_game()
         N_PLAYERS = RandomGen.randint(self.MIN_PLAYERS, self.MAX_PLAYERS)
         self.generate_random_players(N_PLAYERS)
@@ -311,7 +359,14 @@ class MultiplayerGame(Game):
         print("\n\t".join(map(str, self.players)))
 
     def generate_random_players(self, amount) -> None:
-        """Generate <amount> random players. Don't need anything unique, but you can do so if you'd like."""
+        """
+            Generate <amount> random players. Don't need anything unique, but you can do so if you'd like.
+
+            Parameters:
+                - amount: the number of players to be generated
+
+            :complexity: O(N) where N is amount
+        """
         self.players_generated = []
         player_names = []
         players_balance = []
@@ -325,6 +380,19 @@ class MultiplayerGame(Game):
                 number += 1
 
     def initialise_with_data(self, materials: list[Material], caves: list[Cave], traders: list[Trader], player_names: list[int], emerald_info: list[float]):
+        """
+            Initialises game using specific data.
+            Sets all game objects to the data passed through.
+            
+            Parameters:
+                - materials : the list of materials
+                - caves     : the list of caves
+                - traders   : the list of traders
+                - player_names: the list of player integers
+                - emerald_info: the list of balances
+            
+            :complexity: O(1)
+        """
         super().initialise_with_data(materials, caves, traders)
         for player, emerald in zip(player_names, emerald_info):
             self.players.append(Player(player, emeralds=emerald))
@@ -338,7 +406,6 @@ class MultiplayerGame(Game):
         # 1. Traders make deals
         self.trader_material_list = []
         for trader in self.traders:
-            # trader = self.traders.__getitem__(trader_key)
             trader.generate_deal()
             self.trader_material_list.append(trader.get_material_selected())
         self.set_traders(self.traders)
@@ -354,7 +421,28 @@ class MultiplayerGame(Game):
 
     def select_for_players(self, food: Food) -> tuple[list[Food|None], list[float], list[tuple[Cave, float]|None]]:
         """
+            1. Check whether each player can afford the food. If they can afford, add it to food_list
+            and if not, add None to food_list.
+            2. Create an AVLTree object that checks for traders that will have the highest buy price
+            and append the cave that has that material to the AVLTree
+            3. Then, push all the values from smallest to largest to a LinkedStack so that players will mine
+            in decreasing order of profit
+            
+            Parameters:
+                - food: the food in which a player will buy if the player can afford it
+
+            Returns:
+                - food_list: a list of food or None depending on whether the player can afford it
+                - profit_list: a list of balances that each player obtains from entering caves
+                - caves_list: a list of caves that each player visited respectively
+
+            :complexity: O(n+m)+O(1)
+            where n is length of self.caves
+            and m is the length of self.player
+            and constant for the while loop
         """
+        self.expected_balances = []
+        self.the_food = food
         food_list = []
         for player in self.players:
             if player.get_balance() >= food.get_price():
@@ -362,33 +450,29 @@ class MultiplayerGame(Game):
             else:
                 food_list.append(None)
 
-        # highest_bidding_trader = self.traders_list.get_maximal(self.traders_list.get_root())
-        # material_to_mine = highest_bidding_trader.item.get_material_selected()
-
-        # 1. match trader profits to cave profits
-        # 2. calculate max profit based on what traders are selling
-        # 3. add the max profits to an avl
-        # 4. from the bottom of avl, push to stack
-
         emeralds_key = []
         emeralds_avl = AVLTree()
         for cave in self.caves:
             material_in_cave = cave.get_material() #each material
             quantity_in_cave = cave.get_quantity()
             if material_in_cave in self.trader_material_list:
-                print("here", material_in_cave)
                 index = self.trader_material_list.index(material_in_cave)
-                print(self.trader_material_list[index])
-                print("the trader",self.traders[index])
                 profit = self.traders[index].get_buy_price() * quantity_in_cave
                 if profit not in emeralds_key:
                     emeralds_avl.__setitem__(profit, cave)
                     emeralds_key.append(profit)
         
+        balance_heap = MaxHeap(len(emeralds_key))
+        for value in emeralds_key:
+            balance_heap.add(value)
+        
+        max_item = balance_heap.get_max()
+        while balance_heap.is_full() == True:
+            self.expected_balances.append(max_item)
+
         cave_stack = LinkedStack()
         while emeralds_avl.is_empty() == False:
             the_smallest = emeralds_avl.get_minimal(emeralds_avl.get_root())
-            print("smallest",the_smallest)
             emeralds_avl.__delitem__(the_smallest.key)
             cave_stack.push(the_smallest)
         
@@ -407,163 +491,37 @@ class MultiplayerGame(Game):
 
         return tuple((food_list, profit_list, cave_list))
         
-    def verify_output_and_update_quantities(self, foods: Food | None, balances: float, caves: list[tuple[Cave, float]|None]) -> None:
-        for 
-        
-        materials = self.player.get_materials_mined()
-        expected_balance = self.player.get_original_hunger_bars() - food.item.get_price()
-        for index in range(len(materials)):
-            the_material = materials[index][0].get_material() #get the material from the cave
-            for trader in range(len(self.traders)):
-                if self.traders[trader].get_material_selected() == the_material: #checks whether it is the same material
-                    expected_balance += self.traders[trader].get_buy_price() * materials[index][1]
+    def verify_output_and_update_quantities(self, foods: list[Food | None], balances: list[float], caves: list[tuple[Cave, float]|None]) -> None:
+        """
+            Verifies that the foods bought by the players are correct
+            Calculates the expected balance based on the list of materials that the players has mined
+            and verifies that the balances are the same as the expected balances.
+            Updates the quantities of materials in caves by referencing the quantities
+            in the list of materials mined.
 
-        for cave in range(len(caves)):
-            original_cave = caves[cave]
-            original_caves_quantity = caves[cave][1]
-            quantity_to_check = materials[cave][1]
-            if (original_caves_quantity >= quantity_to_check):
-                cave_index = self.caves.index(original_cave[0])
-                self.caves[cave_index].remove_quantity(quantity_to_check)
+            Parameters:
+                - foods: list of food that the players bought
+                - balances: list of players' balances after mining
+                - caves: list of caves player visited and quantities that the players mined
+            
+            :complexity: O(N+M+O) where N is the length of foods, M is the length of self.expected_balances and 
+                         O is the length of caves
+        """
+        food_to_check = self.the_food
+        for food in foods:
+            if food == food_to_check or food == None:
+                continue
             else:
-                raise ValueError("The quantities are wrong.")
-        print("The quantities are correct.")
+                raise ValueError("The food bought is wrong.")
+        print("The food bought is correct.")
 
-        if food != None:
-            print("The food is purchasable.")
-        else:
-            raise ValueError("The food is not purchasable.")
+        for balance in range(len(self.expected_balances)):
+            if self.expected_balances[balance] == balances[balance]:
+                continue
+            else:
+                raise ValueError("The balance is wrong.")
+        print("The balances are correct.")
 
-        if (expected_balance == balance):
-            print("The balance is correct.")
-        else:
-            raise ValueError("The balance is wrong.")
-
-if __name__ == "__main__":
-    # RandomGen.set_seed(1239087123)
-    # g = SoloGame()
-    # g.initialise_game()
-    # # I'm going to assume you have a `name` attribute on the Materials.
-    # print(len(set(map(lambda m: m.name, g.get_materials()))))
-    # print(len(g.get_materials()))
-    # # Same deal with caves
-    # print(len(set(map(lambda c: c.name, g.get_caves()))))
-    # print(len(g.get_caves()))
-    # # and Traders
-    # print(len(set(map(lambda t: t.name, g.get_traders()))))
-    # print(len(g.get_traders()))
-
-    # RandomGen.set_seed(1234)
-    # g = SoloGame()
-    # g.initialise_game()
-    # # Spend some time in minecraft
-    # # Note that this will crash if you generate a HardTrader with less than 3 materials.
-    # for _ in range(3):
-    #     g.simulate_day()
-    #     g.finish_day()
-
-    # RandomGen.set_seed(16)
-    # gold = Material("Gold Nugget", 27.24)
-    # netherite = Material("Netherite Ingot", 20.95)
-    # fishing_rod = Material("Fishing Rod", 26.93)
-    # ender_pearl = Material("Ender Pearl", 13.91)
-    # prismarine = Material("Prismarine Crystal", 11.48)
-
-    # materials = [
-    #     gold,
-    #     netherite,
-    #     fishing_rod,
-    #     ender_pearl,
-    #     prismarine,
-    # ]
-
-    # caves = [
-    #     Cave("Boulderfall Cave", prismarine, 10),
-    #     Cave("Castle Karstaag Ruins", netherite, 4),
-    #     Cave("Glacial Cave", gold, 3),
-    #     Cave("Orotheim", fishing_rod, 6),
-    #     Cave("Red Eagle Redoubt", fishing_rod, 3),
-    # ]
-
-    # waldo = RandomTrader("Waldo Morgan")
-    # waldo.add_material(fishing_rod)     # Now selling for 7.57
-    # orson = RandomTrader("Orson Hoover")
-    # orson.add_material(gold)            # Now selling for 4.87
-    # lea = RandomTrader("Lea Carpenter")
-    # lea.add_material(prismarine)        # Now selling for 5.65
-    # ruby = RandomTrader("Ruby Goodman")
-    # ruby.add_material(netherite)        # Now selling for 8.54
-    # mable = RandomTrader("Mable Hodge")
-    # mable.add_material(gold)            # Now selling for 6.7
-    
-    # traders = [
-    #     waldo,
-    #     orson,
-    #     lea,
-    #     ruby,
-    #     mable,
-    # ]
-    
-    # for trader in traders:
-    #     trader.generate_deal()
-
-    # g = SoloGame()
-    # g.initialise_with_data(materials, caves, traders, ["Jackson"], [50])
-
-    # # Avoid simulate_day - This regenerates trader deals and foods.
-    # foods = [
-    #     Food("Cabbage Seeds", 106, 30),
-    #     Food("Fried Rice", 129, 24),
-    #     Food("Cooked Chicken Cuts", 424, 19),
-    # ]
-
-    # g.player.set_foods(foods)
-    # food, balance, caves = g.player.select_food_and_caves()
-    
-    # print(balance) # 185.01974749350165 - pow(10, -4))
-    # # Actual tests will also check your output is possible.
-
-    RandomGen.set_seed(1234)
-    materials = [
-        Material.random_material()
-        for _ in range(400)
-    ]
-    mat_set = set()
-    mining_set = set()
-    materials = list(filter(lambda x: (x.name not in mat_set and x.mining_rate not in mining_set) and (mat_set.add(x.name) or mining_set.add(x.mining_rate)) is None, materials))
-    caves = [
-        Cave.random_cave(materials)
-        for _ in range(400)
-    ]
-    cave_set = set()
-    caves = list(filter(lambda x: x.name not in cave_set and cave_set.add(x.name) is None, caves))        
-    traders = [
-        RandomGen.random_choice([RangeTrader, RandomTrader]).random_trader()
-        for _ in range(50)
-    ]
-    trade_set = set()
-    traders = list(filter(lambda x: x.name not in trade_set and trade_set.add(x.name) is None, traders))
-    for trader in traders:
-        trader.set_all_materials(materials)
-    players = [
-        RandomGen.random_choice(PLAYER_NAMES)
-        for _ in range(20)
-    ]
-    balances = [
-        RandomGen.randint(20, 100)
-        for _ in range(20)
-    ]
-    RandomGen.set_seed(12345)
-    g = MultiplayerGame()
-    g.initialise_with_data(
-        materials,
-        caves,
-        traders,
-        players,
-        balances,
-    )
-    
-    # Live a year in minecraft
-    for _ in range(365):
-        g.simulate_day()
-        g.finish_day()
+        for cave in caves:
+            cave_index = self.caves.index(cave[0])
+            self.caves[cave_index].remove_quantity(cave[1])
