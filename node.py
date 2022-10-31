@@ -45,4 +45,4 @@ class AVLTreeNode(TreeNode, Generic[K, I]):
         """
 
         super(AVLTreeNode, self).__init__(key, item)
-
+        self.height = 1

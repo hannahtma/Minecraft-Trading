@@ -170,6 +170,8 @@ class LinearProbeTable(Generic[T]):
         if self.__len__() > self.tablesize // 2:
             self._rehash()
 
+        if self.__len__() > self.tablesize // 2:
+            self._rehash()
         position = self._linear_probe(key, True)
 
         if self.table[position] is None:

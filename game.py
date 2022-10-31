@@ -14,7 +14,7 @@ from player import Player, PLAYER_NAMES
 from trader import Trader, RandomTrader, RangeTrader, HardTrader
 from material import Material
 from cave import Cave
-from food import Food
+from food import FOOD_NAMES, Food
 from random_gen import RandomGen
 from avl import AVLTree
 from heap import MaxHeap
