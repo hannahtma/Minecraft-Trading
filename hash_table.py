@@ -68,9 +68,7 @@ class LinearProbeTable(Generic[T]):
         # print(ord(key[0]))
         # print(self.tablesize)
         # print(ord(key[0]) % self.tablesize)
-
         return (ord(key[0]) % self.tablesize)
-
 
     def statistics(self) -> tuple:
         """
@@ -179,9 +177,9 @@ class LinearProbeTable(Generic[T]):
             :see: #self._linear_probe(key: str, is_insert: bool)
             :see: #self.__contains__(key: str)
         """
-
         if self.__len__() > self.tablesize // 2:
             self._rehash()
+
         position = self._linear_probe(key, True)
 
         if self.table[position] is None:
