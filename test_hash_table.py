@@ -58,7 +58,7 @@ class TestHashTable(unittest.TestCase):
         f.close()
         
         conflict, probe_total, probe_max, rehash = table.statistics()
-        self.assertGreaterEqual(conflict, 39)
+        self.assertGreaterEqual(conflict, 38)
         self.assertGreaterEqual(probe_total, 548)
         self.assertGreaterEqual(probe_max, 44)
         self.assertGreaterEqual(rehash, 2)

@@ -110,7 +110,11 @@ class Game:
         self.traders = traders
         
     def get_materials(self) -> list[Material]:
-        
+                """
+        Returns the material list
+
+        Complexity: O(1)
+        """
         return self.materials
 
     def get_caves(self) -> list[Cave]:
