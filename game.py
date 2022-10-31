@@ -293,12 +293,14 @@ class SoloGame(Game):
         materials = self.player.get_materials_mined()
         expected_balance = self.player.get_original_hunger_bars() - food.item.get_price()
         for index in range(len(materials)):
-            the_material = materials[index][0].get_material() #get the material from the cave
+            the_material = materials[index][0].get_material() # get the material from the cave
             for trader in range(len(self.traders)):
                 if self.traders[trader].get_material_selected() == the_material: #checks whether it is the same material
                     expected_balance += self.traders[trader].get_buy_price() * materials[index][1]
-        for cave in range(len(caves)):
-            original_cave = caves[cave]
+        
+        for cave in range(len(caves)): 
+            # compares the cave and quantities to update the amount of each material in the cave
+            original_cave = caves[cave] 
             original_caves_quantity = caves[cave][1]
             quantity_to_check = materials[cave][1]
             if (original_caves_quantity >= quantity_to_check):
@@ -308,11 +310,11 @@ class SoloGame(Game):
                 raise ValueError("The quantities are wrong.")
         print("The quantities are correct.")
 
-        # if no food is put in,  
+        # if no food is put in, that means none is bought. 
         if food != None:
-            print("The food is purchasable.")
+            print("The food was bought.")
         else:
-            raise ValueError("The food is not purchasable.")
+            raise ValueError("You did not buy food.")
 
         if (expected_balance == balance):
             print("The balance is correct.")
@@ -371,6 +373,7 @@ class MultiplayerGame(Game):
         player_names = []
         players_balance = []
         number = 0
+        #add the players as much as am
         while number < amount:
             player_to_add = Player.random_player()
             if player_to_add.get_name() not in player_names and player_to_add.get_balance() not in players_balance:
@@ -436,49 +439,64 @@ class MultiplayerGame(Game):
                 - profit_list: a list of balances that each player obtains from entering caves
                 - caves_list: a list of caves that each player visited respectively
 
-            :complexity: O(n+m)+O(1)
-            where n is length of self.caves
-            and m is the length of self.player
-            and constant for the while loop
+            :complexity: O(M + T + C + P)
+            where C is amount of caves, 
+            P is the amount of player,
+            T is the amount of trader,
+            M is the amount of materials
         """
+        # initialize expected balance and food list O(1)
         self.expected_balances = []
         self.the_food = food
         food_list = []
-        for player in self.players:
+        # append the food if balance is sufficient
+        # else pass none
+        for player in self.players: # O(P)
             if player.get_balance() >= food.get_price():
                 food_list.append(food)
             else:
                 food_list.append(None)
-
+        
+        # initialize list of key and avl
         emeralds_key = []
         emeralds_avl = AVLTree()
-        for cave in self.caves:
-            material_in_cave = cave.get_material() #each material
+        # calculate profit according to price of material and quantity
+        for cave in self.caves: # O(C)
+            material_in_cave = cave.get_material() 
             quantity_in_cave = cave.get_quantity()
-            if material_in_cave in self.trader_material_list:
-                index = self.trader_material_list.index(material_in_cave)
+            if material_in_cave in self.trader_material_list: # O(T)
+                index = self.trader_material_list.index(material_in_cave) # O(M)
                 profit = self.traders[index].get_buy_price() * quantity_in_cave
-                if profit not in emeralds_key:
+                # if profit not already in list of key
+                # add profit and cave to avl followed by appending profit to key list
+                if profit not in emeralds_key: # O(T)
                     emeralds_avl.__setitem__(profit, cave)
                     emeralds_key.append(profit)
         
-        balance_heap = MaxHeap(len(emeralds_key))
-        for value in emeralds_key:
+        # Create a max heap to store all emerald values and append each value from emerald_keys
+        balance_heap = MaxHeap(len(emeralds_key)) 
+        for value in emeralds_key: # O(T)
             balance_heap.add(value)
         
+        # Get the items off the heap and append them to self.expected_balances
         max_item = balance_heap.get_max()
         while balance_heap.is_full() == True:
             self.expected_balances.append(max_item)
 
+        # initialize cave linked stack
         cave_stack = LinkedStack()
+        # while the balance is not empty
         while emeralds_avl.is_empty() == False:
+            # get lowest balance
             the_smallest = emeralds_avl.get_minimal(emeralds_avl.get_root())
             emeralds_avl.__delitem__(the_smallest.key)
             cave_stack.push(the_smallest)
         
         profit_list = []
         cave_list = []
-        for player in self.players:
+        # Each player will go into caves based on max profit and mine all materials they can mine
+        # and deduct the hunger bars it took
+        for player in self.players: # O(P)
             if cave_stack.is_empty() == False:
                 big_cave = cave_stack.pop().item
                 cave_list.append((big_cave, big_cave.get_quantity()))
@@ -504,10 +522,16 @@ class MultiplayerGame(Game):
                 - balances: list of players' balances after mining
                 - caves: list of caves player visited and quantities that the players mined
             
-            :complexity: O(N+M+O) where N is the length of foods, M is the length of self.expected_balances and 
-                         O is the length of caves
+            :complexity: O(N + M + O) 
+            where N is the length of foods, 
+            M is the length of self.expected_balances and 
+            O is the length of caves
         """
+
+        # Assign the food to check by accessing the one from select_for_players
         food_to_check = self.the_food
+        # If the food is not equal to the provided food or not None, raise a ValueError that says that
+        # the food bought is incorrect.
         for food in foods:
             if food == food_to_check or food == None:
                 continue
@@ -515,6 +539,7 @@ class MultiplayerGame(Game):
                 raise ValueError("The food bought is wrong.")
         print("The food bought is correct.")
 
+        # Check through the balances and make sure that each balance lines up to what was suppposed to be mined
         for balance in range(len(self.expected_balances)):
             if self.expected_balances[balance] == balances[balance]:
                 continue
@@ -522,6 +547,7 @@ class MultiplayerGame(Game):
                 raise ValueError("The balance is wrong.")
         print("The balances are correct.")
 
+        # Go through each cave and update cave quantities
         for cave in caves:
             cave_index = self.caves.index(cave[0])
             self.caves[cave_index].remove_quantity(cave[1])
