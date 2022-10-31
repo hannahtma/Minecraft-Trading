@@ -115,7 +115,9 @@ class Cave:
         self.name = name
         self.material = material
         self.quantity = quantity
-    
+        if self.quantity == 0:
+            self.quantity = round(RandomGen.randint(1, 10), 2)
+
     def add_quantity(self, amount: float) -> None:
         """
         Add cave quantity
